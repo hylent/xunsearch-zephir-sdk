@@ -1,0 +1,6 @@
+namespace Xs;
+
+class Search
+{
+
+}
