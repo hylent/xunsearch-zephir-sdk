@@ -5,7 +5,7 @@ class Search extends Server
     const PAGE_SIZE = 10;
     const LOG_DB    = "log_db";
 
-    private defaultOp = Xs::CMD_QUERY_OP_AND;
+    private defaultOp = Command::CMD_QUERY_OP_AND;
     private prefix;
     private fieldSet;
     private resetScheme = false;
@@ -22,6 +22,11 @@ class Search extends Server
     private limit = 0;
     private offset = 0;
     private charset = "UTF-8";
+
+    public function __construct(string conn = "", <Xs> xs = null) -> void
+    {
+        parent::__construct(conn, xs);
+    }
 
     public function open(string conn) -> void
     {
@@ -44,7 +49,7 @@ class Search extends Server
 
     public function setFuzzy(boolean value = true)
     {
-        let this->defaultOp = value ? Xs::CMD_QUERY_OP_OR : Xs::CMD_QUERY_OP_AND;
+        let this->defaultOp = value ? Command::CMD_QUERY_OP_OR : Command::CMD_QUERY_OP_AND;
         return this;
     }
 
@@ -54,7 +59,7 @@ class Search extends Server
 
         let percent = (long) max(0, min(100, percent));
         let weight = (long) max(0, (long) (weight * 10) & 255);
-        let cmd = new Command(Xs::CMD_SEARCH_SET_CUTOFF, percent, weight);
+        let cmd = new Command(Command::CMD_SEARCH_SET_CUTOFF, percent, weight);
         this->execCommand(cmd);
         return this;
     }
@@ -64,9 +69,9 @@ class Search extends Server
         long arg1, arg2;
         var cmd;
 
-        let arg1 = Xs::CMD_SEARCH_MISC_MATCHED_TERM;
+        let arg1 = Command::CMD_SEARCH_MISC_MATCHED_TERM;
         let arg2 = value ? 1 : 0;
-        let cmd = new XSCommand(Xs::CMD_SEARCH_SET_MISC, , arg2);
+        let cmd = new Command(Command::CMD_SEARCH_SET_MISC, arg1, arg2);
         this->execCommand(cmd);
         return this;
     }
@@ -76,11 +81,11 @@ class Search extends Server
         long flag;
         var cmd;
 
-        let flag = Xs::CMD_PARSE_FLAG_BOOLEAN | Xs::CMD_PARSE_FLAG_PHRASE | Xs::CMD_PARSE_FLAG_LOVEHATE;
+        let flag = Command::CMD_PARSE_FLAG_BOOLEAN | Command::CMD_PARSE_FLAG_PHRASE | Command::CMD_PARSE_FLAG_LOVEHATE;
         if value {
-            let flag |= Xs::CMD_PARSE_FLAG_AUTO_MULTIWORD_SYNONYMS;
+            let flag = flag | Command::CMD_PARSE_FLAG_AUTO_MULTIWORD_SYNONYMS;
         }
-        let cmd = ["cmd": Xs::CMD_QUERY_PARSEFLAG, "arg": flag];
+        let cmd = ["cmd": Command::CMD_QUERY_PARSEFLAG, "arg": flag];
         this->execCommand(cmd);
         return this;
     }
@@ -90,9 +95,9 @@ class Search extends Server
         long arg1, arg2;
         var cmd;
 
-        let arg1 = Xs::CMD_SEARCH_MISC_SYN_SCALE;
+        let arg1 = Command::CMD_SEARCH_MISC_SYN_SCALE;
         let arg2 = (long) max(0, (long) (value * 100) & 255);
-        let cmd = new Command(Xs::CMD_SEARCH_SET_MISC, arg1, arg2);
+        let cmd = new Command(Command::CMD_SEARCH_SET_MISC, arg1, arg2);
         this->execCommand(cmd);
         return this;
     }
@@ -103,13 +108,13 @@ class Search extends Server
         var cmd, res, ret, line, value, key;
 
         if limit > 0 {
-            let page = pack("II", offset, limit);
+            let page = (string) pack("II", offset, limit);
         } else {
             let page = "";
         }
-        let cmd = ["cmd": Xs::CMD_SEARCH_GET_SYNONYMS, "buf1": page];
+        let cmd = ["cmd": Command::CMD_SEARCH_GET_SYNONYMS, "buf1": page];
         let cmd["arg1"] = stemmed ? 1 : 0;
-        let res = this->execCommand(cmd, Xs::CMD_OK_RESULT_SYNONYMS);
+        let res = this->execCommand(cmd, Command::CMD_OK_RESULT_SYNONYMS);
         let ret = [];
         if ! empty res->buf {
             for line in explode("\n", res->buf) {
@@ -128,8 +133,8 @@ class Search extends Server
         if term->length() < 1 {
             return false;
         }
-        let cmd = ["cmd": Xs::CMD_SEARCH_GET_SYNONYMS, "arg1": 2, "buf": term];
-        let res = this->execCommand(cmd, Xs::CMD_OK_RESULT_SYNONYMS);
+        let cmd = ["cmd": Command::CMD_SEARCH_GET_SYNONYMS, "arg1": 2, "buf": term];
+        let res = this->execCommand(cmd, Command::CMD_OK_RESULT_SYNONYMS);
         if res->buf === "" {
             return [];
         }
@@ -147,14 +152,14 @@ class Search extends Server
             let query = this->preQueryString(query);
         }
 
-        let cmd = new Command(Xs::CMD_QUERY_GET_STRING, 0, this->defaultOp, query);
-        let res = this->execCommand(cmd, Xs::CMD_OK_QUERY_STRING);
+        let cmd = new Command(Command::CMD_QUERY_GET_STRING, 0, this->defaultOp, query);
+        let res = this->execCommand(cmd, Command::CMD_OK_QUERY_STRING);
         if strpos(res->buf, "VALUE_RANGE") !== false {
-            let regex = "/(VALUE_RANGE) (\d+) (\S+) (.+?)(?=\))/";
+            let regex = "/(VALUE_RANGE) (\\d+) (\\S+) (.+?)(?=\\))/";
             let res->buf = preg_replace_callback(regex, [this, "formatValueRange"], res->buf);
         }
         if strpos(res->buf, "VALUE_GE") !== false || strpos(res->buf, "VALUE_LE") !== false {
-            let regex = "/(VALUE_[GL]E) (\d+) (.+?)(?=\))/";
+            let regex = "/(VALUE_[GL]E) (\\d+) (.+?)(?=\\))/";
             let res->buf = preg_replace_callback(regex, [this, "formatValueRange"], res->buf);
         }
         return Xs::convert(res->buf, this->charset, "UTF-8");
@@ -189,19 +194,19 @@ class Search extends Server
                 let vno = this->xs->getField(value, true)->vno;
                 let asc = false;
             }
-            if vno != XSFieldScheme::MIXED_VNO {
+            if vno != FieldScheme::MIXED_VNO {
                 let buf .= chr(vno) . chr(asc ? 1 : 0);
             }
         }
         if buf !== "" {
-            let type = Xs::CMD_SORT_TYPE_MULTI;
+            let type = Command::CMD_SORT_TYPE_MULTI;
             if relevanceFirst {
-                let type |= Xs::CMD_SORT_FLAG_RELEVANCE;
+                let type = type | Command::CMD_SORT_FLAG_RELEVANCE;
             }
             if ! reversed {
-                let type |= Xs::CMD_SORT_FLAG_ASCENDING;
+                let type = type | Command::CMD_SORT_FLAG_ASCENDING;
             }
-            let cmd = new Command(Xs::CMD_SEARCH_SET_SORT, type, 0, buf);
+            let cmd = new Command(Command::CMD_SEARCH_SET_SORT, type, 0, buf);
             this->execCommand(cmd);
         }
         return this;
@@ -216,17 +221,17 @@ class Search extends Server
             return this->setMultiSort(field, asc, relevanceFirst);
         }
         if field === null {
-            let cmd = new Command(Xs::CMD_SEARCH_SET_SORT, Xs::CMD_SORT_TYPE_RELEVANCE);
+            let cmd = new Command(Command::CMD_SEARCH_SET_SORT, Command::CMD_SORT_TYPE_RELEVANCE);
         } else {
-            let type = Xs::CMD_SORT_TYPE_VALUE;
+            let type = Command::CMD_SORT_TYPE_VALUE;
             if relevanceFirst {
-                let type |= Xs::CMD_SORT_FLAG_RELEVANCE;
+                let type = type | Command::CMD_SORT_FLAG_RELEVANCE;
             }
             if asc {
-                let type |= Xs::CMD_SORT_FLAG_ASCENDING;
+                let type = type | Command::CMD_SORT_FLAG_ASCENDING;
             }
             let vno = this->xs->getField(field, true)->vno;
-            let cmd = new XSCommand(Xs::CMD_SEARCH_SET_SORT, type, vno);
+            let cmd = new Command(Command::CMD_SEARCH_SET_SORT, type, vno);
         }
         this->execCommand(cmd);
         return this;
@@ -238,11 +243,11 @@ class Search extends Server
         var cmd;
 
         if asc {
-            let type = Xs::CMD_SORT_TYPE_DOCID | Xs::CMD_SORT_FLAG_ASCENDING;
+            let type = Command::CMD_SORT_TYPE_DOCID | Command::CMD_SORT_FLAG_ASCENDING;
         } else {
-            let type = Xs::CMD_SORT_TYPE_DOCID;
+            let type = Command::CMD_SORT_TYPE_DOCID;
         }
-        let cmd = new Command(Xs::CMD_SEARCH_SET_SORT, type);
+        let cmd = new Command(Command::CMD_SEARCH_SET_SORT, type);
         this->execCommand(cmd);
         return this;
     }
@@ -258,7 +263,7 @@ class Search extends Server
             let vno = this->xs->getField(field, true)->vno;
         }
         let max = (long) min(255, num);
-        let cmd = new Command(Xs::CMD_SEARCH_SET_COLLAPSE, max, vno);
+        let cmd = new Command(Command::CMD_SEARCH_SET_COLLAPSE, max, vno);
         this->execCommand(cmd);
         return this;
     }
@@ -266,6 +271,7 @@ class Search extends Server
     public function addRange(var field, var from, var to)
     {
         long vno;
+        var cmd;
 
         if from === "" || from === false {
             let from = null;
@@ -281,13 +287,13 @@ class Search extends Server
             let from = Xs::convert(from, "UTF-8", this->charset);
             let to = Xs::convert(to, "UTF-8", this->charset);
             if from === null {
-                let cmd = new Command(Xs::CMD_QUERY_VALCMP, Xs::CMD_QUERY_OP_FILTER, vno, to, chr(Xs::CMD_VALCMP_LE));
+                let cmd = new Command(Command::CMD_QUERY_VALCMP, Command::CMD_QUERY_OP_FILTER, vno, to, chr(Command::CMD_VALCMP_LE));
             } else {
                 if to === null {
-                    let cmd = new Command(Xs::CMD_QUERY_VALCMP, Xs::CMD_QUERY_OP_FILTER, vno, from,
-                        chr(Xs::CMD_VALCMP_GE));
+                    let cmd = new Command(Command::CMD_QUERY_VALCMP, Command::CMD_QUERY_OP_FILTER, vno, from,
+                        chr(Command::CMD_VALCMP_GE));
                 } else {
-                    let cmd = new Command(Xs::CMD_QUERY_RANGE, Xs::CMD_QUERY_OP_FILTER, vno, from, to);
+                    let cmd = new Command(Command::CMD_QUERY_RANGE, Command::CMD_QUERY_OP_FILTER, vno, from, to);
                 }
             }
             this->execCommand(cmd);
@@ -297,13 +303,13 @@ class Search extends Server
 
     public function addWeight(var field, string term, long weight = 1)
     {
-        return this->addQueryTerm(field, term, Xs::CMD_QUERY_OP_AND_MAYBE, weight);
+        return this->addQueryTerm(field, term, Command::CMD_QUERY_OP_AND_MAYBE, weight);
     }
 
     public function setFacets(var field, boolean exact = false)
     {
         string buf = "";
-        var fields, ff;
+        var fields, ff, cmd;
 
         if typeof field == "array" {
             let fields = field;
@@ -318,7 +324,7 @@ class Search extends Server
             }
             let buf .= chr(ff->vno);
         }
-        let cmd = ["cmd": Xs::CMD_SEARCH_SET_FACETS, "buf": buf];
+        let cmd = ["cmd": Command::CMD_SEARCH_SET_FACETS, "buf": buf];
         let cmd["arg1"] = exact ? 1 : 0;
         this->execCommand(cmd);
         return this;
@@ -342,7 +348,7 @@ class Search extends Server
         var cmd;
 
         if level >= 0 && level < 16 {
-            let cmd = ["cmd": Xs::CMD_SEARCH_SCWS_SET, "arg1": Xs::CMD_SCWS_SET_MULTI, "arg2": level];
+            let cmd = ["cmd": Command::CMD_SEARCH_SCWS_SET, "arg1": Command::CMD_SCWS_SET_MULTI, "arg2": level];
             this->execCommand(cmd);
         }
         return this;
@@ -357,17 +363,17 @@ class Search extends Server
 
     public function setDb(string name)
     {
-        this->execCommand(["cmd": Xs::CMD_SEARCH_SET_DB, "buf": name]);
-        this->lastDb = this->curDb;
-        this->lastDbs = this->curDbs;
-        this->curDb = name;
-        this->curDbs = [];
+        this->execCommand(["cmd": Command::CMD_SEARCH_SET_DB, "buf": name]);
+        let this->lastDb = this->curDb;
+        let this->lastDbs = this->curDbs;
+        let this->curDb = name;
+        let this->curDbs = [];
         return this;
     }
 
     public function addDb(string name)
     {
-        this->execCommand(["cmd": Xs::CMD_SEARCH_ADD_DB, "buf": name]);
+        this->execCommand(["cmd": Command::CMD_SEARCH_ADD_DB, "buf": name]);
         let this->curDbs[] = name;
         return this;
     }
@@ -389,8 +395,8 @@ class Search extends Server
         if (query === "" && this->terms !== null) {
             let ret = this->terms;
         } else {
-            let cmd = new Command(Xs::CMD_QUERY_GET_TERMS, 0, this->defaultOp, query);
-            let res = this->execCommand(cmd, Xs::CMD_OK_QUERY_TERMS);
+            let cmd = new Command(Command::CMD_QUERY_GET_TERMS, 0, this->defaultOp, query);
+            let res = this->execCommand(cmd, Command::CMD_OK_QUERY_TERMS);
             let ret = [];
             let tmps = explode(" ", res->buf);
             for tmp in tmps {
@@ -400,11 +406,11 @@ class Search extends Server
                 let ret[] = tmp;
             }
             if query === "" {
-                this->terms = ret;
+                let this->terms = ret;
             }
         }
         if convert {
-            return Xs::convert(ret, this->charset, "UTF-8")
+            return Xs::convert(ret, this->charset, "UTF-8");
         }
         return ret;
     }
@@ -421,8 +427,8 @@ class Search extends Server
         if query === "" && this->count !== null {
             return this->count;
         }
-        let cmd = new Command(Xs::CMD_SEARCH_GET_TOTAL, 0, this->defaultOp, query);
-        let res = this->execCommand(cmd, Xs::CMD_OK_SEARCH_TOTAL);
+        let cmd = new Command(Command::CMD_SEARCH_GET_TOTAL, 0, this->defaultOp, query);
+        let res = this->execCommand(cmd, Command::CMD_OK_SEARCH_TOTAL);
         let ret = unpack("Icount", res->buf);
         if query === "" {
             let this->count = ret["count"];
@@ -435,6 +441,7 @@ class Search extends Server
         string page, value;
         var cmd, res, tmp, ret, vnoes, name, doc = null;
         long off;
+        boolean endLoop = false;
 
         if this->curDb !== self::LOG_DB && saveHighlight {
             let this->highlight = query;
@@ -444,9 +451,9 @@ class Search extends Server
         } else {
             let query = this->preQueryString(query);
         }
-        let page = pack("II", this->offset, this->limit > 0 ? this->limit : self::PAGE_SIZE);
-        let cmd = new Command(Xs::CMD_SEARCH_GET_RESULT, 0, this->defaultOp, query, page);
-        let res = this->execCommand(cmd, Xs::CMD_OK_RESULT_BEGIN);
+        let page = (string) pack("II", this->offset, this->limit > 0 ? this->limit : self::PAGE_SIZE);
+        let cmd = new Command(Command::CMD_SEARCH_GET_RESULT, 0, this->defaultOp, query, page);
+        let res = this->execCommand(cmd, Command::CMD_OK_RESULT_BEGIN);
         let tmp = unpack("Icount", res->buf);
         let this->lastCount = tmp["count"];
         let this->facets = [];
@@ -455,43 +462,46 @@ class Search extends Server
         loop {
             let res = this->getRespond();
             switch res->cmd {
-                case Xs::CMD_SEARCH_RESULT_FACETS:
+                case Command::CMD_SEARCH_RESULT_FACETS:
                     let off = 0;
                     while off + 6 < strlen(res->buf) {
                         let tmp = unpack("Cvno/Cvlen/Inum", substr(res->buf, off, 6));
                         if fetch name, vnoes[tmp["vno"]] {
                             let value = substr(res->buf, off + 6, tmp["vlen"]);
-                            if ! isset this->facets[name] {
-                                let this->facets[name] = [];
-                            }
                             let this->facets[name][value] = tmp["num"];
                         }
                         let off += tmp["vlen"] + 6;
                     }
                     break;
-                case Xs::CMD_SEARCH_RESULT_DOC:
+                case Command::CMD_SEARCH_RESULT_DOC:
                     let doc = new Document(res->buf, this->charset);
                     let ret[] = doc;
                     break;
-                case Xs::CMD_SEARCH_RESULT_FIELD:
+                case Command::CMD_SEARCH_RESULT_FIELD:
                     if doc {
-                        if ! fetch name, vnoes[res->arg] {
-                            let name = res->arg;
+                        let name = res->getArg();
+                        if fetch tmp, vnoes[name] {
+                            let name = tmp;
                         }
                         doc->setField(name, res->buf);
                     }
                     break;
-                case Xs::CMD_SEARCH_RESULT_MATCHED:
+                case Command::CMD_SEARCH_RESULT_MATCHED:
                     if doc {
                         doc->setField("matched", explode(" ", res->buf), true);
                     }
                     break;
-                case Xs::CMD_OK:
-                    if res->arg == Xs::CMD_OK_RESULT_END {
+                case Command::CMD_OK:
+                    if res->getArg() == Command::CMD_OK_RESULT_END {
+                        let endLoop = true;
                         break;
                     }
                 default:
-                    throw new Exception("Unexpected respond in search {CMD:" . res->cmd . ", ARG:" . res->arg . "}");
+                    let name = res->getArg();
+                    throw new Exception("Unexpected respond in search {CMD:" . res->cmd . ", ARG:" . name . "}");
+            }
+            if endLoop {
+                break;
             }
         }
         if query === "" {
@@ -517,8 +527,8 @@ class Search extends Server
     {
         var cmd, res, tmp;
 
-        let cmd = new Command(Xs::CMD_SEARCH_DB_TOTAL);
-        let res = this->execCommand(cmd, Xs::CMD_OK_DB_TOTAL);
+        let cmd = new Command(Command::CMD_SEARCH_DB_TOTAL);
+        let res = this->execCommand(cmd, Command::CMD_OK_DB_TOTAL);
         let tmp = unpack("Itotal", res->buf);
         return tmp["total"];
     }
@@ -526,7 +536,6 @@ class Search extends Server
     public function getHotQuery(long limit = 6, string type = "total") -> array
     {
         var ret = [], result, doc, body, ex;
-        long limit;
 
         let limit = (long) max(1, min(50, limit));
         this->xs->setScheme(FieldScheme::logger());
@@ -543,7 +552,7 @@ class Search extends Server
             }
             this->restoreDb();
         } catch Exception, ex {
-            if ex->getCode() != Xs::CMD_ERR_XAPIAN {
+            if ex->getCode() != Command::CMD_ERR_XAPIAN {
                 throw ex;
             }
         }
@@ -563,7 +572,7 @@ class Search extends Server
         if empty query || strpos(query, ":") !== false {
             return ret;
         }
-        let op = this->defaultOp;
+        let op = (long) this->defaultOp;
         this->xs->setScheme(FieldScheme::logger());
         try {
             let result = this->setDb(self::LOG_DB)->setFuzzy()->setLimit(limit + 1)->search(query);
@@ -580,7 +589,7 @@ class Search extends Server
                 }
             }
         } catch Exception, ex {
-            if ex->getCode() != Xs::CMD_ERR_XAPIAN {
+            if ex->getCode() != Command::CMD_ERR_XAPIAN {
                 throw ex;
             }
         }
@@ -598,22 +607,22 @@ class Search extends Server
 
         let limit = (long) max(1, min(20, limit));
         try {
-            let buf = Xs::convert(query, "UTF-8", this->charset);
-            let cmd = ["cmd": Xs::CMD_QUERY_GET_EXPANDED, "arg1": limit, "buf": buf];
-            let res = this->execCommand(cmd, Xs::CMD_OK_RESULT_BEGIN);
+            let buf = (string) Xs::convert(query, "UTF-8", this->charset);
+            let cmd = ["cmd": Command::CMD_QUERY_GET_EXPANDED, "arg1": limit, "buf": buf];
+            let res = this->execCommand(cmd, Command::CMD_OK_RESULT_BEGIN);
             loop {
                 let res = this->getRespond();
-                if res->cmd == Xs::CMD_SEARCH_RESULT_FIELD {
+                if res->cmd == Command::CMD_SEARCH_RESULT_FIELD {
                     let ret[] = Xs::convert(res->buf, this->charset, "UTF-8");
                     continue;
                 }
-                if res->cmd == Xs::CMD_OK && res->arg == Xs::CMD_OK_RESULT_END {
+                if res->cmd == Command::CMD_OK && res->getArg() == Command::CMD_OK_RESULT_END {
                     break;
                 }
-                throw new Exception("Unexpected respond in search {CMD:" . res->cmd . ", ARG:" . res->arg . "}");
+                throw new Exception("Unexpected respond in search {CMD:" . res->cmd . ", ARG:" . res->getArg() . "}");
             }
         } catch Exception, ex {
-            if ex->getCode() != Xs::CMD_ERR_XAPIAN {
+            if ex->getCode() != Command::CMD_ERR_XAPIAN {
                 throw ex;
             }
         }
@@ -636,14 +645,14 @@ class Search extends Server
             if empty query || strpos(query, ":") !== false {
                 return ret;
             }
-            let buf = Xs::convert(query, "UTF-8", this->charset);
-            let cmd = ["cmd": Xs::CMD_QUERY_GET_CORRECTED, "buf": buf];
-            let res = this->execCommand(cmd, Xs::CMD_OK_QUERY_CORRECTED);
+            let buf = (string) Xs::convert(query, "UTF-8", this->charset);
+            let cmd = ["cmd": Command::CMD_QUERY_GET_CORRECTED, "buf": buf];
+            let res = this->execCommand(cmd, Command::CMD_OK_QUERY_CORRECTED);
             if res->buf !== "" {
                 let ret = explode("\n", Xs::convert(res->buf, this->charset, "UTF-8"));
             }
         } catch Exception, ex {
-            if ex->getCode() != Xs::CMD_ERR_XAPIAN {
+            if ex->getCode() != Command::CMD_ERR_XAPIAN {
                 throw ex;
             }
         }
@@ -654,11 +663,11 @@ class Search extends Server
     {
         var cmd;
 
-        let cmd = ["cmd": Xs::CMD_SEARCH_ADD_LOG, "buf": query)];
+        let cmd = ["cmd": Command::CMD_SEARCH_ADD_LOG, "buf": query];
         if wdf > 1 {
             let cmd["buf1"] = pack("i", wdf);
         }
-        this->execCommand(cmd, Xs::CMD_OK_LOGGED);
+        this->execCommand(cmd, Command::CMD_OK_LOGGED);
     }
 
     public function highlight(string value, boolean strtr = false)
@@ -698,7 +707,7 @@ class Search extends Server
         } else {
             let query = this->query;
             if ! this->lastCount
-                || (this->defaultOp == Xs::CMD_QUERY_OP_OR && strpos(query, " "))
+                || (this->defaultOp == Command::CMD_QUERY_OP_OR && strpos(query, " "))
                 || strpos(query, " OR ")
                 || strpos(query, " NOT ")
                 || strpos(query, " XOR ") {
@@ -745,7 +754,7 @@ class Search extends Server
     {
         var cmd;
 
-        let cmd = new XSCommand(Xs::CMD_QUERY_INIT);
+        let cmd = new Command(Command::CMD_QUERY_INIT);
         if this->resetScheme === true {
             let cmd->arg1 = 1;
             let this->prefix = [];
@@ -758,31 +767,31 @@ class Search extends Server
         let this->query = null;
     }
 
-    public function addQueryString(var query, long addOp = Xs::CMD_QUERY_OP_AND, long scale = 1) -> string
+    public function addQueryString(var query, long addOp = Command::CMD_QUERY_OP_AND, long scale = 1) -> string
     {
         string bscale;
         var cmd;
 
         let query = this->preQueryString(query);
         if scale > 0 && scale != 1 {
-            let bscale = pack("n", (long) (scale * 100));
+            let bscale = (string) pack("n", (long) (scale * 100));
         } else {
             let bscale = "";
         }
-        let cmd = new Command(Xs::CMD_QUERY_PARSE, addOp, this->defaultOp, query, bscale);
+        let cmd = new Command(Command::CMD_QUERY_PARSE, addOp, this->defaultOp, query, bscale);
         this->execCommand(cmd);
         return query;
     }
 
-    public function addQueryTerm(var field, string term, long addOp = Xs::CMD_QUERY_OP_AND, long scale = 1)
+    public function addQueryTerm(var field, string term, long addOp = Command::CMD_QUERY_OP_AND, long scale = 1)
     {
         string bscale;
         long vno;
         var cmd;
 
-        let term = Xs::convert(term->lower(), "UTF-8", this->charset);
+        let term = (string) Xs::convert(term->lower(), "UTF-8", this->charset);
         if scale > 0 && scale != 1 {
-            let bscale = pack("n", (long) (scale * 100));
+            let bscale = (string) pack("n", (long) (scale * 100));
         } else {
             let bscale = "";
         }
@@ -791,7 +800,7 @@ class Search extends Server
         } else {
             let vno = this->xs->getField(field, true)->vno;
         }
-        cmd = new Command(Xs::CMD_QUERY_TERM, addOp, vno, term, bscale);
+        let cmd = new Command(Command::CMD_QUERY_TERM, addOp, vno, term, bscale);
         this->execCommand(cmd);
         return this;
     }
@@ -826,13 +835,13 @@ class Search extends Server
                 continue;
             }
             if newQuery != "" {
-                newQuery .= " ";
+                let newQuery .= " ";
             }
             let pos = strpos(part, ":", 1);
             if pos !== false {
                 let i = 0;
                 while i < pos {
-                    if strpos("+-~(", part[i]) === false {
+                    if strpos("+-~(", substr(part, i, 1)) === false {
                         break;
                     }
                     let i++;
@@ -867,8 +876,8 @@ class Search extends Server
                 }
             }
             if strlen(part) > 1
-                && (part[0] == "+" || part[0] == "-")
-                && part[1] != "("
+                && strpos("+-", substr(part, 0, 1)) !== false
+                && substr(part, 1, 1) !== "("
                 && preg_match("/[\x81-\xfe]/", part) {
                 let newQuery .= substr(part, 0, 1) . "(" . substr(part, 1) . ")";
                 continue;
@@ -886,8 +895,8 @@ class Search extends Server
         if ! isset this->prefix[name] {
             let field = this->xs->getField(name, false);
             if field->vno != FieldScheme::MIXED_VNO {
-                let type = field->isBoolIndex() ? Xs::CMD_PREFIX_BOOLEAN : Xs::CMD_PREFIX_NORMAL;
-                let cmd = new Command(Xs::CMD_QUERY_PREFIX, type, field->vno, name);
+                let type = field->isBoolIndex() ? Command::CMD_PREFIX_BOOLEAN : Command::CMD_PREFIX_NORMAL;
+                let cmd = new Command(Command::CMD_QUERY_PREFIX, type, field->vno, name);
                 this->execCommand(cmd);
                 let this->prefix[name] = true;
             }
@@ -905,12 +914,12 @@ class Search extends Server
         // FieldMeta field
         for field in this->xs->getAllFields() {
             if field->cutlen != 0 {
-                let len = min(127, ceil(field->cutlen / 10));
-                let cmd = new Command(Xs::CMD_SEARCH_SET_CUT, len, field->vno);
+                let len = (long) min(127, ceil(field->cutlen / 10));
+                let cmd = new Command(Command::CMD_SEARCH_SET_CUT, len, field->vno);
                 this->execCommand(cmd);
             }
             if field->isNumeric() {
-                let cmd = new Command(Xs::CMD_SEARCH_SET_NUMERIC, 0, field->vno);
+                let cmd = new Command(Command::CMD_SEARCH_SET_NUMERIC, 0, field->vno);
                 this->execCommand(cmd);
             }
         }
@@ -930,7 +939,7 @@ class Search extends Server
     {
         var field;
 
-        let field = this->xs->getField(match[2], false)
+        let field = this->xs->getField(match[2], false);
         if field === false {
             return match[0];
         }
@@ -1036,13 +1045,14 @@ class Search extends Server
             return 0.0;
         }
         if value === str_repeat("\xff", 9) {
-            return INF;
+            return constant("INF");
         }
         if value === "" {
-            return -INF;
+            return 0.0 - constant("INF");
         }
         let i = 0;
-        let c = ord(value[0]) ^ ((c & 0xc0) >> 1);
+        let c = (long) ord(value[0]);
+        let c = c ^ ((c & 0xc0) >> 1);
         if (c & 0x80) {
             let negative = 0;
         } else {
@@ -1061,7 +1071,7 @@ class Search extends Server
         let exponent = c & 0x1f;
         if explen {
             let i++;
-            let c = this->numfromstr(value, i);
+            let c = (long) this->numfromstr(value, i);
             let exponent = (exponent << 6) | (c >> 2);
             if (negative ^ exponentNegative) {
                 let exponent = exponent & 0x07ff;
@@ -1073,15 +1083,22 @@ class Search extends Server
             }
         }
         let word1 = (c & 0x03) << 24;
-        let word1 = word1 | this->numfromstr(value, ++i) << 16;
-        let word1 = word1 | this->numfromstr(value, ++i) << 8;
-        let word1 = word1 | this->numfromstr(value, ++i);
+        let i++;
+        let word1 = word1 | this->numfromstr(value, i) << 16;
+        let i++;
+        let word1 = word1 | this->numfromstr(value, i) << 8;
+        let i++;
+        let word1 = word1 | this->numfromstr(value, i);
         let word2 = 0;
         if i < strlen(value) {
-            let word2 = this->numfromstr(value, ++i) << 24;
-            let word2 = word2 | this->numfromstr(value, ++i) << 16;
-            let word2 = word2 | this->numfromstr(value, ++i) << 8;
-            let word2 = word2 | this->numfromstr(value, ++i);
+            let i++;
+            let word2 = this->numfromstr(value, i) << 24;
+            let i++;
+            let word2 = word2 | this->numfromstr(value, i) << 16;
+            let i++;
+            let word2 = word2 | this->numfromstr(value, i) << 8;
+            let i++;
+            let word2 = word2 | this->numfromstr(value, i);
         }
         if negative {
             let word1 = 0 - word1;
@@ -1091,20 +1108,24 @@ class Search extends Server
             let word2 = 0 - word2;
             let word1 = word1 & 0x03ffffff;
         } else {
-            let word1 = word1 | 1 << 26;
+            let word1 = word1 | (1 << 26);
         }
         let mantissa = 0;
         if word2 {
             let mantissa = word2 / 4294967296.0; // 1<<32
         }
         let mantissa += word1;
-        let mantissa /= 1 << (negative === 1 ? 26 : 27);
+        if negative === 1 {
+            let mantissa = mantissa / (1 << 26);
+        } else {
+            let mantissa = mantissa / (1 << 27);
+        }
         if exponentNegative {
             let exponent = 0 - exponent;
         }
         let exponent += 8;
         if negative {
-            mantissa = 0 - mantissa;
+            let mantissa = 0 - mantissa;
         }
         return round(mantissa * pow(2, exponent), 2);
     }

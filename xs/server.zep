@@ -1,6 +1,6 @@
-namespace Xs
+namespace Xs;
 
-class Server
+class Server extends Component
 {
     const FILE      = 0x01;
     const BROKEN    = 0x02;
@@ -23,7 +23,7 @@ class Server
 
     public function __destruct() -> void
     {
-        this->xs = null;
+        let this->xs = null;
         this->close();
     }
 
@@ -40,7 +40,7 @@ class Server
         let this->flag = this->flag ^ self::BROKEN;
 
         if typeof this->xs == "object" && (this->xs instanceof Xs) {
-            let this->project = this->xs->getName();
+            this->setProject(this->xs->getName());
         }
     }
 
@@ -60,16 +60,16 @@ class Server
         if this->sock && ! (this->flag & self::BROKEN) {
             if ! ioerr && this->sendBuffer !== "" {
                 this->write(this->sendBuffer);
-                this->sendBuffer = "";
+                let this->sendBuffer = "";
             }
 
             if ! ioerr && ! (this->flag & self::FILE) {
-                let cmd = new Command(Xs::CMD_QUIT);
+                let cmd = new Command(Command::CMD_QUIT);
                 fwrite(this->sock, (string) cmd);
             }
 
             fclose(this->sock);
-            this->flag |= self::BROKEN;
+            let this->flag = this->flag | self::BROKEN;
         }
     }
 
@@ -103,23 +103,25 @@ class Server
     public function setProject(string name, string home = "") -> void
     {
         if name !== this->project {
-            this->execCommand(["cmd": Xs::CMD_USE, "buf": name, "buf1": home], Xs::CMD_OK_PROJECT);
+            this->execCommand(["cmd": Command::CMD_USE, "buf": name, "buf1": home], Command::CMD_OK_PROJECT);
             let this->project = name;
         }
     }
 
     public function setTimeout(long sec) -> void
     {
-        this->execCommand(["cmd": Xs::CMD_TIMEOUT, "arg": sec], Xs::CMD_OK_TIMEOUT_SET);
+        this->execCommand(["cmd": Command::CMD_TIMEOUT, "arg": sec], Command::CMD_OK_TIMEOUT_SET);
     }
 
-    public function execCommand(var cmd, long resArg = Xs::CMD_NONE, long resCmd = Xs::CMD_OK)
+    public function execCommand(var cmdArg, long resArg = Command::CMD_NONE, long resCmd = Command::CMD_OK)
     {
         string buf;
-        var res;
+        var cmd, res;
 
-        if typeof cmd != "object" || ! (cmd instanceof Command) {
-            let cmd = new Command(cmd);
+        if typeof cmdArg == "object" && (cmdArg instanceof Command) {
+            let cmd = cmdArg;
+        } else {
+            let cmd = new Command(cmdArg);
         }
 
         if (cmd->cmd & 0x80) {
@@ -136,21 +138,25 @@ class Server
         }
 
         let res = this->getRespond();
-        if res->cmd === Xs::CMD_ERR && resCmd != Xs::CMD_ERR {
-            throw new Exception(res->buf, res->arg);
+        if res->cmd === Command::CMD_ERR && resCmd != Command::CMD_ERR {
+            throw new Exception(res->buf, res->getArg());
         }
 
-        if res->cmd != resCmd || (resArg != Xs::CMD_NONE && res->arg != resArg) {
-            throw new Exception("Unexpected respond {CMD:" . res->cmd . ", ARG:" . res->arg . "}");
+        if res->cmd != resCmd || (resArg != Command::CMD_NONE && res->getArg() != resArg) {
+            throw new Exception("Unexpected respond {CMD:" . res->cmd . ", ARG:" . res->getArg() . "}");
         }
 
         return res;
     }
 
-    public function sendCommand(var cmd) -> void
+    public function sendCommand(var cmdArg) -> void
     {
-        if typeof cmd != "object" || ! (cmd instanceof Command) {
-            let cmd = new Command(cmd);
+        var cmd;
+
+        if typeof cmdArg == "object" && (cmdArg instanceof Command) {
+            let cmd = cmdArg;
+        } else {
+            let cmd = new Command(cmdArg);
         }
 
         this->write((string) cmd);
@@ -214,20 +220,21 @@ class Server
         if bytes === false || bytes === 0 {
             let meta = stream_get_meta_data(this->sock);
             this->close(true);
-
-            let msg = "Failed to send data to server completely (SIZE:" . (size - len) . "/" . size . ", REASON:";
             if meta["timed_out"] {
-                let msg .= "timeout";
+                let msg = "timeout";
             } else {
                 if meta["eof"] {
-                    let msg .= "closed";
+                    let msg = "closed";
                 } else {
-                    let msg .= "unknown";
+                    let msg = "unknown";
                 }
             }
-            let msg .= ")";
-
-            throw new Exception(msg);
+            throw new Exception(sprintf(
+                "Failed to send data to server completely (SIZE:%d/%d, REASON:%s)",
+                size - len,
+                size,
+                msg
+            ));
         }
     }
 
@@ -261,20 +268,21 @@ class Server
 
         let meta = stream_get_meta_data(this->sock);
         this->close(true);
-
-        let msg = "Failed to recv data to server completely (SIZE:" . (size - len) . "/" . size . ", REASON:";
         if meta["timed_out"] {
-            let msg .= "timeout";
+            let msg = "timeout";
         } else {
             if meta["eof"] {
-                let msg .= "closed";
+                let msg = "closed";
             } else {
-                let msg .= "unknown";
+                let msg = "unknown";
             }
         }
-        let msg .= ")";
-
-        throw new Exception(msg);
+        throw new Exception(sprintf(
+            "Failed to recv data to server completely (SIZE:%d/%d, REASON:%s)",
+            size - len,
+            size,
+            msg
+        ));
     }
 
     protected function check() -> void
@@ -283,7 +291,7 @@ class Server
             throw new Exception("No server connection");
         }
 
-        if unlikely (this->flag & self::BROKEN) {
+        if (this->flag & self::BROKEN) {
             throw new Exception("Broken server connection");
         }
     }
@@ -292,7 +300,7 @@ class Server
     {
         string conn, host;
         long port, timeout;
-        var pos, sock, errno = null, error = null;
+        var pos, sock, errNo = null, err = null;
 
         let conn = (string) this->conn;
 
@@ -303,7 +311,7 @@ class Server
                 throw new Exception("Failed to open local file for writing: " . conn);
             }
             let this->flag = this->flag | self::FILE;
-            this->sock = sock;
+            let this->sock = sock;
             return;
         }
 
@@ -321,9 +329,9 @@ class Server
             }
         }
 
-        let sock = fsockopen(host, port, errno, error, 5);
+        let sock = fsockopen(host, port, errNo, err, 5);
         if sock === false {
-            throw new Exception(error . "(C#" . errno . ", " . host . ":" . port . ")");
+            throw new Exception(err . "(C#" . errNo . ", " . host . ":" . port . ")");
         }
 
         let timeout = (long) ini_get("max_execution_time");
@@ -334,7 +342,7 @@ class Server
         }
 
         stream_set_blocking(sock, true);
-        stream_set_timeout(sock, timeout);
+        stream_set_timeout(sock, timeout, 0);
 
         let this->sock = sock;
     }

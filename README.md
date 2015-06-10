@@ -1,2 +1,2 @@
-# zephir-xunsearch
+# xunsearch-zephir-sdk
 Xunsearch SDK Zephir implementation

@@ -1,8 +1,6 @@
-namespace Xs\Tokenizer;
+namespace Xs;
 
-use Xs\Tokenizer;
-
-class Split implements Tokenizer
+class TokenizerSplit implements Tokenizer
 {
     private arg = " ";
 

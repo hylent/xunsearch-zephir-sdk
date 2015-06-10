@@ -1,8 +1,6 @@
-namespace Xs\Tokenizer;
+namespace Xs;
 
-use Xs\Tokenizer;
-
-class Xstep implements Tokenizer
+class TokenizerXstep implements Tokenizer
 {
     private arg = 2;
 

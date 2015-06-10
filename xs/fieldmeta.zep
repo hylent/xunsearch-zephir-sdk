@@ -37,7 +37,7 @@ class FieldMeta
 
     public function __toString() -> string
     {
-        return this->name;
+        return (string) this->name;
     }
 
     public function val(var value)
@@ -117,15 +117,15 @@ class FieldMeta
         var m = null;
         string name, arg;
 
-        if fetch tokenizer self::tokenizers[this->tokenizer] {
+        if fetch tokenizer, self::tokenizers[this->tokenizer] {
             return tokenizer;
         }
 
         if preg_match("/^([^\\(]+)\\((.*)\\)$/", this->tokenizer, m) {
-            let name = __NAMESPACE__ . "\\Tokenizer\\" . (string) ucfirst(m[1]);
+            let name = __NAMESPACE__ . "\\Tokenizer" . (string) ucfirst(m[1]);
             let arg = (string) m[2];
         } else {
-            let name = __NAMESPACE__ . "\\Tokenizer\\" . (string) ucfirst(this->tokenizer);
+            let name = __NAMESPACE__ . "\\Tokenizer" . (string) ucfirst(this->tokenizer);
             let arg = "";
         }
 
@@ -172,21 +172,25 @@ class FieldMeta
         if this->type !== self::TYPE_BODY {
             let index = this->flag & self::FLAG_INDEX_BOTH;
             if index {
-                if index === self::FLAG_INDEX_BOTH {
-                    if this->type !== self::TYPE_TITLE {
-                        let s .= "index = both\n";
-                    }
-                } else if index === self::FLAG_INDEX_MIXED {
-                    let s .= "index = mixed\n";
-                } else {
-                    if this->type !== self::TYPE_ID {
-                        let s .= "index = self\n";
-                    }
+                switch index {
+                    case self::FLAG_INDEX_BOTH:
+                        if this->type !== self::TYPE_TITLE {
+                            let s .= "index = both\n";
+                        }
+                        break;
+                    case self::FLAG_INDEX_MIXED:
+                        let s .= "index = mixed\n";
+                        break;
+                    default:
+                        if this->type !== self::TYPE_ID {
+                            let s .= "index = self\n";
+                        }
+                        break;
                 }
             }
         }
 
-        if this->type !== self::TYPE_ID && this->tokenizer !== XSTokenizer::DFL {
+        if this->type !== self::TYPE_ID && this->tokenizer !== Tokenizer::DFL {
             let s .= "tokenizer = " . this->tokenizer . "\n";
         }
 
@@ -221,7 +225,7 @@ class FieldMeta
         string predef;
 
         if fetch c, config["type"] {
-            let predef = "self::TYPE_" . strtoupper(c);
+            let predef = __CLASS__ . "::TYPE_" . strtoupper(c);
             if defined(predef) {
                 let this->type = constant(predef);
                 switch this->type {
@@ -243,9 +247,9 @@ class FieldMeta
         }
 
         if fetch c, config["index"] && this->type != self::TYPE_BODY {
-            let predef = "self::FLAG_INDEX_" . strtoupper(c);
+            let predef = __CLASS__ . "::FLAG_INDEX_" . strtoupper(c);
             if defined(predef) {
-                let this->flag = (this->flag & (~ self::FLAG_INDEX_BOTH)) | constant(predef);
+                let this->flag = (this->flag & (0xffff - self::FLAG_INDEX_BOTH)) | (long) constant(predef);
             }
             if this->type == self::TYPE_ID {
                 let this->flag = this->flag | self::FLAG_INDEX_SELF;
@@ -266,7 +270,7 @@ class FieldMeta
                     let this->flag = this->flag | self::FLAG_WITH_POSITION;
                     break;
                 case "no":
-                    let this->flag = this->flag & (~ self::FLAG_WITH_POSITION);
+                    let this->flag = this->flag & (0xffff - self::FLAG_WITH_POSITION);
                     break;
             }
         }
@@ -277,7 +281,7 @@ class FieldMeta
                     let this->flag = this->flag | self::FLAG_NON_BOOL;
                     break;
                 case "no":
-                    let this->flag = this->flag & (~ self::FLAG_NON_BOOL);
+                    let this->flag = this->flag & (0xffff - self::FLAG_NON_BOOL);
                     break;
             }
         }

@@ -1,8 +1,6 @@
-namespace Xs\Tokenizer;
+namespace Xs;
 
-use Xs\Tokenizer;
-
-class Full implements Tokenizer
+class TokenizerFull implements Tokenizer
 {
     public function getTokens(string value, <Document> doc = null) -> array
     {

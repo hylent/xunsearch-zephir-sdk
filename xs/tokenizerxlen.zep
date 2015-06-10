@@ -1,8 +1,6 @@
-namespace Xs\Tokenizer;
+namespace Xs;
 
-use Xs\Tokenizer;
-
-class Xlen implements Tokenizer
+class TokenizerXlen implements Tokenizer
 {
     private arg = 2;
 

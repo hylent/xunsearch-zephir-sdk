@@ -23,7 +23,7 @@ class FieldScheme implements \IteratorAggregate
             scheme->addField("total", ["type": "numeric", "index": "self"]);
             scheme->addField("lastnum", ["type": "numeric", "index": "self"]);
             scheme->addField("currnum", ["type": "numeric", "index": "self"]);
-            scheme->addField("currtag", ["type": "string"));
+            scheme->addField("currtag", ["type": "string"]);
             scheme->addField("body", ["type": "body"]);
 
             let self::logger = scheme;
@@ -66,7 +66,7 @@ class FieldScheme implements \IteratorAggregate
         }
 
         if typeof this->fields == "array" {
-            for name, field in this->fields {
+            for field in this->fields {
                 if field->type === FieldMeta::TYPE_STRING && ! field->isBoolIndex() {
                     return field;
                 }
@@ -129,12 +129,14 @@ class FieldScheme implements \IteratorAggregate
         return [];
     }
 
-    public function addField(var field, array config = null) -> void
+    public function addField(var fieldArg, array config = null) -> void
     {
-        var prev;
+        var field, prev;
 
-        if typeof field != "object" || ! (field instanceof FieldMeta) {
-            let field = new FieldMeta(field, config);
+        if typeof fieldArg == "object" && (fieldArg instanceof FieldMeta) {
+            let field = fieldArg;
+        } else {
+            let field = new FieldMeta(fieldArg, config);
         }
 
         if unlikely isset this->fields[field->name] {
@@ -174,9 +176,9 @@ class FieldScheme implements \IteratorAggregate
         return true;
     }
 
-    public function getIterator() -> <ArrayIterator>
+    public function getIterator() -> <\ArrayIterator>
     {
-        return new ArrayIterator(this->fields);
+        return new \ArrayIterator(this->fields);
     }
 
 }

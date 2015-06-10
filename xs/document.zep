@@ -59,7 +59,7 @@ class Document implements \ArrayAccess, \IteratorAggregate
         if this->meta !== null {
             let nameLower = name->lower();
 
-            if fetch v, this->meta[name] && v !== null {
+            if fetch v, this->meta[nameLower] && v !== null {
                 return v;
             }
         }
@@ -112,9 +112,9 @@ class Document implements \ArrayAccess, \IteratorAggregate
             }
         } else {
             if isMeta {
-                this->meta[name] = value;
+                let this->meta[name] = value;
             } else {
-                this->data[name] = value;
+                let this->data[name] = value;
             }
         }
     }
@@ -182,7 +182,7 @@ class Document implements \ArrayAccess, \IteratorAggregate
         let this->texts[field] = v;
     }
 
-    public function getIterator() -> <ArrayIterator>
+    public function getIterator() -> <\ArrayIterator>
     {
         var data;
         string from, to;
@@ -201,7 +201,7 @@ class Document implements \ArrayAccess, \IteratorAggregate
             let data = this->data;
         }
 
-        return new ArrayIterator(data);
+        return new \ArrayIterator(data);
     }
 
     public function offsetExists(string name) -> boolean

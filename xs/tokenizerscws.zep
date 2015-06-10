@@ -1,10 +1,6 @@
-namespace Xs\Tokenizer;
+namespace Xs;
 
-use Xs\Tokenizer;
-use Xs\Xs;
-use Xs\Command;
-
-class Scws implements Tokenizer
+class TokenizerScws implements Tokenizer
 {
     const MULTI_MASK    = 15;
     const MULTI_NONE    = 0;
@@ -69,14 +65,14 @@ class Scws implements Tokenizer
 
     public function setIgnore(boolean yes = true)
     {
-        let this->setting["ignore"] = new Command(Xs::CMD_SEARCH_SCWS_SET, Xs::CMD_SCWS_SET_IGNORE, yes ? 1 : 0);
+        let this->setting["ignore"] = new Command(Command::CMD_SEARCH_SCWS_SET, Command::CMD_SCWS_SET_IGNORE, yes ? 1 : 0);
         return this;
     }
 
     public function setMulti(long mode = 3)
     {
         let mode = mode & self::MULTI_MASK;
-        let this->setting["multi"] = new Command(Xs::CMD_SEARCH_SCWS_SET, Xs::CMD_SCWS_SET_MULTI, mode);
+        let this->setting["multi"] = new Command(Command::CMD_SEARCH_SCWS_SET, Command::CMD_SCWS_SET_MULTI, mode);
         return this;
     }
 
@@ -89,7 +85,7 @@ class Scws implements Tokenizer
                 let mode = self::XDICT_TXT;
             }
         }
-        let this->setting["set_dict"] = new Command(Xs::CMD_SEARCH_SCWS_SET, Xs::CMD_SCWS_SET_DICT, mode, fpath);
+        let this->setting["set_dict"] = new Command(Command::CMD_SEARCH_SCWS_SET, Command::CMD_SCWS_SET_DICT, mode, fpath);
         unset(this->setting["add_dict"]);
         return this;
     }
@@ -103,13 +99,13 @@ class Scws implements Tokenizer
                 let mode = self::XDICT_TXT;
             }
         }
-        let this->setting["add_dict"][] = new Command(Xs::CMD_SEARCH_SCWS_SET, Xs::CMD_SCWS_ADD_DICT, mode, fpath);
+        let this->setting["add_dict"][] = new Command(Command::CMD_SEARCH_SCWS_SET, Command::CMD_SCWS_ADD_DICT, mode, fpath);
         return this;
     }
 
     public function setDuality(boolean yes = true)
     {
-        let this->setting["duality"] = new Command(Xs::CMD_SEARCH_SCWS_SET, Xs::CMD_SCWS_SET_DUALITY, yes ? 1 : 0);
+        let this->setting["duality"] = new Command(Command::CMD_SEARCH_SCWS_SET, Command::CMD_SCWS_SET_DUALITY, yes ? 1 : 0);
         return this;
     }
 
@@ -117,8 +113,8 @@ class Scws implements Tokenizer
     {
         var cmd, res;
 
-        let cmd = new Command(Xs::CMD_SEARCH_SCWS_GET, Xs::CMD_SCWS_GET_VERSION);
-        let res = self::server->execCommand(cmd, Xs::CMD_OK_INFO);
+        let cmd = new Command(Command::CMD_SEARCH_SCWS_GET, Command::CMD_SCWS_GET_VERSION);
+        let res = self::server->execCommand(cmd, Command::CMD_OK_INFO);
         return res->buf;
     }
 
@@ -127,8 +123,8 @@ class Scws implements Tokenizer
         var words = [], cmd, res, tmp;
 
         let text = this->applySetting(text);
-        let cmd = new Command(Xs::CMD_SEARCH_SCWS_GET, Xs::CMD_SCWS_GET_RESULT, 0, text);
-        let res = self::server->execCommand(cmd, Xs::CMD_OK_SCWS_RESULT);
+        let cmd = new Command(Command::CMD_SEARCH_SCWS_GET, Command::CMD_SCWS_GET_RESULT, 0, text);
+        let res = self::server->execCommand(cmd, Command::CMD_OK_SCWS_RESULT);
         while res->buf !== "" {
             let tmp = unpack("Ioff/a4attr/a*word", res->buf);
             let tmp["word"] = Xs::convert(tmp["word"], self::charset, "UTF-8");
@@ -143,8 +139,8 @@ class Scws implements Tokenizer
         var words = [], cmd, res, tmp;
 
         let text = this->applySetting(text);
-        let cmd = new Command(Xs::CMD_SEARCH_SCWS_GET, Xs::CMD_SCWS_GET_TOPS, limit, text, xattr);
-        let res = self::server->execCommand(cmd, Xs::CMD_OK_SCWS_TOPS);
+        let cmd = new Command(Command::CMD_SEARCH_SCWS_GET, Command::CMD_SCWS_GET_TOPS, limit, text, xattr);
+        let res = self::server->execCommand(cmd, Command::CMD_OK_SCWS_TOPS);
         while res->buf !== "" {
             let tmp = unpack("Itimes/a4attr/a*word", res->buf);
             let tmp["word"] = Xs::convert(tmp["word"], self::charset, "UTF-8");
@@ -159,18 +155,18 @@ class Scws implements Tokenizer
         var cmd, res;
 
         let text = this->applySetting(text);
-        let cmd = new Command(Xs::CMD_SEARCH_SCWS_GET, Xs::CMD_SCWS_HAS_WORD, 0, text, xattr);
-        let res = self::server->execCommand(cmd, Xs::CMD_OK_INFO);
+        let cmd = new Command(Command::CMD_SEARCH_SCWS_GET, Command::CMD_SCWS_HAS_WORD, 0, text, xattr);
+        let res = self::server->execCommand(cmd, Command::CMD_OK_INFO);
         return res->buf === "OK";
     }
 
     private function applySetting(string text) -> string
     {
-        var key, cmd, c;
+        var cmd, c;
 
         self::server->reopen();
         if typeof this->setting == "array" {
-            for key, cmd in this->setting {
+            for cmd in this->setting {
                 if typeof cmd == "array" {
                     for c in cmd {
                         self::server->execCommand(c);
@@ -180,7 +176,7 @@ class Scws implements Tokenizer
                 }
             }
         }
-        return Xx::convert(text, "UTF-8", self::charset);
+        return Xs::convert(text, "UTF-8", self::charset);
     }
 
 }
