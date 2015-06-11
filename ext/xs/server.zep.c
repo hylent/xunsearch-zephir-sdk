@@ -338,10 +338,10 @@ PHP_METHOD(Xs_Server, setTimeout) {
 PHP_METHOD(Xs_Server, execCommand) {
 
 	int ZEPHIR_LAST_CALL_STATUS;
-	zend_bool _0, _6, _10, _11;
-	zval *buf = NULL;
+	zend_bool _0, _9, _13, _14;
+	zval *buf = NULL, *_3 = NULL, *_4 = NULL, *_5;
 	long resArg, resCmd;
-	zval *cmdArg, *resArg_param = NULL, *resCmd_param = NULL, *cmd = NULL, *res = NULL, *_1, *_2, *_3, *_4, *_5, *_7 = NULL, *_8 = NULL, *_9 = NULL, *_12, *_13 = NULL, *_14;
+	zval *cmdArg, *resArg_param = NULL, *resCmd_param = NULL, *cmd = NULL, *res = NULL, *_1, *_2 = NULL, *_6, *_7, *_8, *_10 = NULL, *_11 = NULL, *_12 = NULL, *_15 = NULL, *_16;
 
 	ZEPHIR_MM_GROW();
 	zephir_fetch_params(1, 1, 2, &cmdArg, &resArg_param, &resCmd_param);
@@ -373,67 +373,73 @@ PHP_METHOD(Xs_Server, execCommand) {
 	ZEPHIR_OBS_VAR(_1);
 	zephir_read_property(&_1, cmd, SL("cmd"), PH_NOISY_CC);
 	if (((int) (zephir_get_numberval(_1)) & 0x80)) {
-		zephir_update_property_this(this_ptr, SL("sendBuffer"), cmd TSRMLS_CC);
+		ZEPHIR_OBS_VAR(_2);
+		zephir_read_property_this(&_2, this_ptr, SL("sendBuffer"), PH_NOISY_CC);
+		zephir_get_strval(_3, _2);
+		zephir_get_strval(_4, cmd);
+		ZEPHIR_INIT_VAR(_5);
+		ZEPHIR_CONCAT_VV(_5, _3, _4);
+		zephir_update_property_this(this_ptr, SL("sendBuffer"), _5 TSRMLS_CC);
 		RETURN_MM_BOOL(1);
 	}
-	_2 = zephir_fetch_nproperty_this(this_ptr, SL("sendBuffer"), PH_NOISY_CC);
-	ZEPHIR_INIT_VAR(_3);
-	ZEPHIR_CONCAT_VV(_3, _2, cmd);
-	zephir_get_strval(buf, _3);
-	ZEPHIR_INIT_ZVAL_NREF(_4);
-	ZVAL_STRING(_4, "", 1);
-	zephir_update_property_this(this_ptr, SL("sendBuffer"), _4 TSRMLS_CC);
+	_6 = zephir_fetch_nproperty_this(this_ptr, SL("sendBuffer"), PH_NOISY_CC);
+	ZEPHIR_INIT_VAR(_7);
+	ZEPHIR_CONCAT_VV(_7, _6, cmd);
+	zephir_get_strval(buf, _7);
+	ZEPHIR_INIT_ZVAL_NREF(_8);
+	ZVAL_STRING(_8, "", 1);
+	zephir_update_property_this(this_ptr, SL("sendBuffer"), _8 TSRMLS_CC);
 	ZEPHIR_CALL_METHOD(NULL, this_ptr, "write", NULL, 0, buf);
 	zephir_check_call_status();
-	_4 = zephir_fetch_nproperty_this(this_ptr, SL("flag"), PH_NOISY_CC);
-	if (((int) (zephir_get_numberval(_4)) & 0x01)) {
+	_8 = zephir_fetch_nproperty_this(this_ptr, SL("flag"), PH_NOISY_CC);
+	if (((int) (zephir_get_numberval(_8)) & 0x01)) {
 		RETURN_MM_BOOL(1);
 	}
 	ZEPHIR_CALL_METHOD(&res, this_ptr, "getrespond", NULL, 0);
 	zephir_check_call_status();
-	ZEPHIR_OBS_VAR(_5);
-	zephir_read_property(&_5, res, SL("cmd"), PH_NOISY_CC);
-	_6 = ZEPHIR_IS_LONG_IDENTICAL(_5, 129);
-	if (_6) {
-		_6 = resCmd != 129;
+	ZEPHIR_OBS_NVAR(_2);
+	zephir_read_property(&_2, res, SL("cmd"), PH_NOISY_CC);
+	_9 = ZEPHIR_IS_LONG_IDENTICAL(_2, 129);
+	if (_9) {
+		_9 = resCmd != 129;
 	}
-	if (_6) {
-		ZEPHIR_INIT_VAR(_7);
-		object_init_ex(_7, xs_exception_ce);
-		ZEPHIR_OBS_VAR(_8);
-		zephir_read_property(&_8, res, SL("buf"), PH_NOISY_CC);
-		ZEPHIR_CALL_METHOD(&_9, res, "getarg", NULL, 0);
+	if (_9) {
+		ZEPHIR_INIT_VAR(_10);
+		object_init_ex(_10, xs_exception_ce);
+		ZEPHIR_OBS_VAR(_11);
+		zephir_read_property(&_11, res, SL("buf"), PH_NOISY_CC);
+		ZEPHIR_CALL_METHOD(&_12, res, "getarg", NULL, 0);
 		zephir_check_call_status();
-		ZEPHIR_CALL_METHOD(NULL, _7, "__construct", NULL, 4, _8, _9);
+		ZEPHIR_CALL_METHOD(NULL, _10, "__construct", NULL, 4, _11, _12);
 		zephir_check_call_status();
-		zephir_throw_exception_debug(_7, "xs/server.zep", 142 TSRMLS_CC);
+		zephir_throw_exception_debug(_10, "xs/server.zep", 142 TSRMLS_CC);
 		ZEPHIR_MM_RESTORE();
 		return;
 	}
-	ZEPHIR_OBS_NVAR(_8);
-	zephir_read_property(&_8, res, SL("cmd"), PH_NOISY_CC);
-	_10 = !ZEPHIR_IS_LONG(_8, resCmd);
-	if (!(_10)) {
-		_11 = resArg != 0;
-		if (_11) {
-			ZEPHIR_CALL_METHOD(&_9, res, "getarg", NULL, 0);
+	ZEPHIR_OBS_NVAR(_2);
+	zephir_read_property(&_2, res, SL("cmd"), PH_NOISY_CC);
+	_13 = !ZEPHIR_IS_LONG(_2, resCmd);
+	if (!(_13)) {
+		_14 = resArg != 0;
+		if (_14) {
+			ZEPHIR_CALL_METHOD(&_12, res, "getarg", NULL, 0);
 			zephir_check_call_status();
-			_11 = !ZEPHIR_IS_LONG(_9, resArg);
+			_14 = !ZEPHIR_IS_LONG(_12, resArg);
 		}
-		_10 = _11;
+		_13 = _14;
 	}
-	if (_10) {
-		ZEPHIR_INIT_NVAR(_7);
-		object_init_ex(_7, xs_exception_ce);
-		ZEPHIR_OBS_VAR(_12);
-		zephir_read_property(&_12, res, SL("cmd"), PH_NOISY_CC);
-		ZEPHIR_CALL_METHOD(&_13, res, "getarg", NULL, 0);
+	if (_13) {
+		ZEPHIR_INIT_NVAR(_10);
+		object_init_ex(_10, xs_exception_ce);
+		ZEPHIR_OBS_NVAR(_11);
+		zephir_read_property(&_11, res, SL("cmd"), PH_NOISY_CC);
+		ZEPHIR_CALL_METHOD(&_15, res, "getarg", NULL, 0);
 		zephir_check_call_status();
-		ZEPHIR_INIT_VAR(_14);
-		ZEPHIR_CONCAT_SVSVS(_14, "Unexpected respond {CMD:", _12, ", ARG:", _13, "}");
-		ZEPHIR_CALL_METHOD(NULL, _7, "__construct", NULL, 4, _14);
+		ZEPHIR_INIT_VAR(_16);
+		ZEPHIR_CONCAT_SVSVS(_16, "Unexpected respond {CMD:", _11, ", ARG:", _15, "}");
+		ZEPHIR_CALL_METHOD(NULL, _10, "__construct", NULL, 4, _16);
 		zephir_check_call_status();
-		zephir_throw_exception_debug(_7, "xs/server.zep", 146 TSRMLS_CC);
+		zephir_throw_exception_debug(_10, "xs/server.zep", 146 TSRMLS_CC);
 		ZEPHIR_MM_RESTORE();
 		return;
 	}
@@ -537,7 +543,7 @@ PHP_METHOD(Xs_Server, hasRespond) {
 	ZEPHIR_INIT_VAR(_5);
 	ZVAL_LONG(_5, 0);
 	Z_SET_ISREF_P(rfds);
-	ZEPHIR_CALL_FUNCTION(&_6, "stream_select", NULL, 51, rfds, wfds, xfds, _4, _5);
+	ZEPHIR_CALL_FUNCTION(&_6, "stream_select", NULL, 50, rfds, wfds, xfds, _4, _5);
 	Z_UNSET_ISREF_P(rfds);
 	zephir_check_call_status();
 	RETURN_MM_BOOL(ZEPHIR_GT_LONG(_6, 0));
@@ -577,7 +583,7 @@ PHP_METHOD(Xs_Server, write) {
 		_0 = zephir_fetch_nproperty_this(this_ptr, SL("sock"), PH_NOISY_CC);
 		ZEPHIR_SINIT_NVAR(_1);
 		ZVAL_LONG(&_1, len);
-		ZEPHIR_CALL_FUNCTION(&bytes, "fwrite", &_2, 52, _0, buf, &_1);
+		ZEPHIR_CALL_FUNCTION(&bytes, "fwrite", &_2, 51, _0, buf, &_1);
 		zephir_check_call_status();
 		_3 = ZEPHIR_IS_FALSE_IDENTICAL(bytes);
 		if (!(_3)) {
@@ -601,7 +607,7 @@ PHP_METHOD(Xs_Server, write) {
 	}
 	if (_3) {
 		_0 = zephir_fetch_nproperty_this(this_ptr, SL("sock"), PH_NOISY_CC);
-		ZEPHIR_CALL_FUNCTION(&meta, "stream_get_meta_data", NULL, 53, _0);
+		ZEPHIR_CALL_FUNCTION(&meta, "stream_get_meta_data", NULL, 52, _0);
 		zephir_check_call_status();
 		ZEPHIR_INIT_NVAR(_5);
 		ZVAL_BOOL(_5, 1);
@@ -668,7 +674,7 @@ PHP_METHOD(Xs_Server, read) {
 		_0 = zephir_fetch_nproperty_this(this_ptr, SL("sock"), PH_NOISY_CC);
 		ZEPHIR_SINIT_NVAR(_1);
 		ZVAL_LONG(&_1, len);
-		ZEPHIR_CALL_FUNCTION(&bytes, "fread", &_2, 54, _0, &_1);
+		ZEPHIR_CALL_FUNCTION(&bytes, "fread", &_2, 53, _0, &_1);
 		zephir_check_call_status();
 		_3 = ZEPHIR_IS_FALSE_IDENTICAL(bytes);
 		if (!(_3)) {
@@ -684,7 +690,7 @@ PHP_METHOD(Xs_Server, read) {
 		}
 	}
 	_0 = zephir_fetch_nproperty_this(this_ptr, SL("sock"), PH_NOISY_CC);
-	ZEPHIR_CALL_FUNCTION(&meta, "stream_get_meta_data", NULL, 53, _0);
+	ZEPHIR_CALL_FUNCTION(&meta, "stream_get_meta_data", NULL, 52, _0);
 	zephir_check_call_status();
 	ZEPHIR_INIT_VAR(_4);
 	ZVAL_BOOL(_4, 1);
@@ -761,7 +767,7 @@ PHP_METHOD(Xs_Server, connect) {
 	ZVAL_STRING(&_2, "file://", 0);
 	ZEPHIR_SINIT_VAR(_3);
 	ZVAL_LONG(&_3, 7);
-	ZEPHIR_CALL_FUNCTION(&_4, "strncmp", NULL, 55, conn, &_2, &_3);
+	ZEPHIR_CALL_FUNCTION(&_4, "strncmp", NULL, 54, conn, &_2, &_3);
 	zephir_check_call_status();
 	if (!(zephir_is_true(_4))) {
 		ZEPHIR_SINIT_NVAR(_2);
@@ -772,7 +778,7 @@ PHP_METHOD(Xs_Server, connect) {
 		ZEPHIR_CPY_WRT(conn, _6);
 		ZEPHIR_SINIT_NVAR(_3);
 		ZVAL_STRING(&_3, "wb", 0);
-		ZEPHIR_CALL_FUNCTION(&sock, "fopen", NULL, 56, conn, &_3);
+		ZEPHIR_CALL_FUNCTION(&sock, "fopen", NULL, 55, conn, &_3);
 		zephir_check_call_status();
 		if (ZEPHIR_IS_FALSE_IDENTICAL(sock)) {
 			ZEPHIR_INIT_VAR(_7);
@@ -824,7 +830,7 @@ PHP_METHOD(Xs_Server, connect) {
 	ZEPHIR_INIT_NVAR(_7);
 	ZVAL_LONG(_7, 5);
 	Z_SET_ISREF_P(errNo);
-	ZEPHIR_CALL_FUNCTION(&sock, "fsockopen", NULL, 57, host, _5, errNo, err, _7);
+	ZEPHIR_CALL_FUNCTION(&sock, "fsockopen", NULL, 56, host, _5, errNo, err, _7);
 	Z_UNSET_ISREF_P(errNo);
 	zephir_check_call_status();
 	if (ZEPHIR_IS_FALSE_IDENTICAL(sock)) {
@@ -842,7 +848,7 @@ PHP_METHOD(Xs_Server, connect) {
 	}
 	ZEPHIR_SINIT_NVAR(_13);
 	ZVAL_STRING(&_13, "max_execution_time", 0);
-	ZEPHIR_CALL_FUNCTION(&_15, "ini_get", NULL, 58, &_13);
+	ZEPHIR_CALL_FUNCTION(&_15, "ini_get", NULL, 57, &_13);
 	zephir_check_call_status();
 	timeout = zephir_get_intval(_15);
 	if (timeout > 0) {
@@ -850,13 +856,13 @@ PHP_METHOD(Xs_Server, connect) {
 	} else {
 		timeout = 30;
 	}
-	ZEPHIR_CALL_FUNCTION(NULL, "stream_set_blocking", NULL, 59, sock, ZEPHIR_GLOBAL(global_true));
+	ZEPHIR_CALL_FUNCTION(NULL, "stream_set_blocking", NULL, 58, sock, ZEPHIR_GLOBAL(global_true));
 	zephir_check_call_status();
 	ZEPHIR_SINIT_NVAR(_13);
 	ZVAL_LONG(&_13, timeout);
 	ZEPHIR_SINIT_VAR(_16);
 	ZVAL_LONG(&_16, 0);
-	ZEPHIR_CALL_FUNCTION(NULL, "stream_set_timeout", NULL, 60, sock, &_13, &_16);
+	ZEPHIR_CALL_FUNCTION(NULL, "stream_set_timeout", NULL, 59, sock, &_13, &_16);
 	zephir_check_call_status();
 	zephir_update_property_this(this_ptr, SL("sock"), sock TSRMLS_CC);
 	ZEPHIR_MM_RESTORE();

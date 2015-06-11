@@ -37,7 +37,7 @@ class Index extends Server
         return srv;
     }
 
-    public function execCommand(var cmd, long resArg = Command::CMD_NONE, long resCmd = Command::CMD_OK) -> <Command>
+    public function execCommand(var cmd, long resArg = Command::CMD_NONE, long resCmd = Command::CMD_OK)
     {
         var res, srv;
 
@@ -66,8 +66,8 @@ class Index extends Server
     public function update(<Document> doc, boolean add = false)
     {
         var fid, key, cmd, cmds, field, value;
-        long varg, wdf, wdf1, wdf2;
-        var terms, term, wdfVar, text, lastCmd;
+        long varg, wdf, wdf1, wdf2, i;
+        var terms, term, wdfVar, text;
 
         if doc->beforeSubmit(this) === false {
             return this;
@@ -192,15 +192,18 @@ class Index extends Server
             }
         }
         let cmds[] = new Command(Command::CMD_INDEX_SUBMIT);
+
         if this->bufSize > 0 {
             this->appendBuffer(implode("", cmds));
         } else {
-            let lastCmd = array_pop(cmds);
-            for cmd in cmds {
-                this->execCommand(cmd);
+            let i = 0;
+            while i < count(cmds) - 1 {
+                this->execCommand(cmds[i]);
+                let i++;
             }
-            this->execCommand(lastCmd, Command::CMD_OK_RQST_FINISHED);
+            this->execCommand(cmds[i], Command::CMD_OK_RQST_FINISHED);
         }
+
         doc->afterSubmit(this);
         return this;
     }
@@ -229,7 +232,10 @@ class Index extends Server
             if count(cmds) == 1 {
                 this->execCommand(cmds[0], Command::CMD_OK_RQST_FINISHED);
             } else {
-                this->execCommand(["cmd": Command::CMD_INDEX_EXDATA, "buf": implode("", cmds)], Command::CMD_OK_RQST_FINISHED);
+                this->execCommand(
+                    ["cmd": Command::CMD_INDEX_EXDATA, "buf": implode("", cmds)],
+                    Command::CMD_OK_RQST_FINISHED
+                );
             }
         }
         return this;
@@ -240,7 +246,7 @@ class Index extends Server
         var dataVar;
         long first;
 
-        if strlen(data) < 255 && checkFile && file_exists(data) {
+        if checkFile && strlen(data) < 255 && file_exists(data) {
             let dataVar = file_get_contents(data);
             if unlikely dataVar === false {
                 throw new Exception("Failed to read exdata from file");
@@ -295,7 +301,9 @@ class Index extends Server
     public function setScwsMulti(long level)
     {
         if level >= 0 && level < 16 {
-            this->execCommand(["cmd": Command::CMD_SEARCH_SCWS_SET, "arg1": Command::CMD_SCWS_SET_MULTI, "arg2": level]);
+            this->execCommand(
+                ["cmd": Command::CMD_SEARCH_SCWS_SET, "arg1": Command::CMD_SCWS_SET_MULTI, "arg2": level]
+            );
         }
         return this;
     }
@@ -304,7 +312,10 @@ class Index extends Server
     {
         var res;
 
-        let res = this->execCommand(["cmd": Command::CMD_SEARCH_SCWS_GET, "arg1": Command::CMD_SCWS_GET_MULTI], Command::CMD_OK_INFO);
+        let res = this->execCommand(
+            ["cmd": Command::CMD_SEARCH_SCWS_GET, "arg1": Command::CMD_SCWS_GET_MULTI] ,
+            Command::CMD_OK_INFO
+        );
         return (long) res->buf;
     }
 
@@ -391,6 +402,7 @@ class Index extends Server
         }
         return true;
     }
+
     public function getCustomDict() -> string
     {
         var res;
@@ -401,7 +413,10 @@ class Index extends Server
 
     public function setCustomDict(string content) -> void
     {
-        this->execCommand(["cmd": Command::CMD_INDEX_USER_DICT, "arg1": 1, "buf": content], Command::CMD_OK_DICT_SAVED);
+        this->execCommand(
+            ["cmd": Command::CMD_INDEX_USER_DICT, "arg1": 1, "buf": content],
+            Command::CMD_OK_DICT_SAVED
+        );
     }
 
     public function close(ioerr = false) -> void
@@ -412,7 +427,7 @@ class Index extends Server
 
     private function appendBuffer(string buf) -> void
     {
-        let this->buf .= buf;
+        let this->buf = (string) this->buf . buf;
         if strlen(this->buf) >= this->bufSize {
             this->addExdata(this->buf, false);
             let this->buf = "";

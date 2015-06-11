@@ -52,11 +52,11 @@ PHP_METHOD(Xs_TokenizerXstep, __construct) {
 		ZVAL_LONG(_0, 255);
 		ZEPHIR_INIT_VAR(_1);
 		ZVAL_LONG(_1, arg);
-		ZEPHIR_CALL_FUNCTION(&_2, "min", NULL, 26, _0, _1);
+		ZEPHIR_CALL_FUNCTION(&_2, "min", NULL, 25, _0, _1);
 		zephir_check_call_status();
 		ZEPHIR_INIT_NVAR(_0);
 		ZVAL_LONG(_0, 1);
-		ZEPHIR_CALL_FUNCTION(&_3, "max", NULL, 27, _0, _2);
+		ZEPHIR_CALL_FUNCTION(&_3, "max", NULL, 26, _0, _2);
 		zephir_check_call_status();
 		zephir_update_property_this(this_ptr, SL("arg"), _3 TSRMLS_CC);
 	}

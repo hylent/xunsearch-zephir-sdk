@@ -202,13 +202,13 @@ PHP_METHOD(Xs_Index, add) {
 
 PHP_METHOD(Xs_Index, update) {
 
-	HashTable *_11, *_26, *_33, *_39, *_42;
-	HashPosition _10, _25, _32, _38, _41;
-	zephir_fcall_cache_entry *_6 = NULL, *_31 = NULL, *_35 = NULL, *_36 = NULL, *_44 = NULL;
+	HashTable *_11, *_26, *_33, *_39;
+	HashPosition _10, _25, _32, _38;
+	zephir_fcall_cache_entry *_6 = NULL, *_31 = NULL, *_35 = NULL, *_36 = NULL, *_42 = NULL;
 	int ZEPHIR_LAST_CALL_STATUS;
-	long varg, wdf, wdf1, wdf2;
+	long varg, wdf, wdf1, wdf2, i;
 	zend_bool add, _2, _22;
-	zval *doc, *add_param = NULL, *fid = NULL, *key = NULL, *cmd = NULL, *cmds, *field = NULL, *value = NULL, *terms = NULL, *term = NULL, *wdfVar = NULL, *text = NULL, *lastCmd = NULL, *_0 = NULL, *_1, *_3 = NULL, *_4 = NULL, *_5 = NULL, *_7, *_8 = NULL, *_9 = NULL, **_12, *_13 = NULL, *_14 = NULL, *_15 = NULL, *_16 = NULL, *_17 = NULL, *_18 = NULL, *_19 = NULL, *_20 = NULL, *_21 = NULL, *_23 = NULL, *_24 = NULL, **_27, *_28 = NULL, *_29 = NULL, *_30 = NULL, **_34, *_37 = NULL, **_40, **_43;
+	zval *doc, *add_param = NULL, *fid = NULL, *key = NULL, *cmd, *cmds, *field = NULL, *value = NULL, *terms = NULL, *term = NULL, *wdfVar = NULL, *text = NULL, *_0 = NULL, *_1, *_3 = NULL, *_4 = NULL, *_5 = NULL, *_7, *_8 = NULL, *_9 = NULL, **_12, *_13 = NULL, *_14 = NULL, *_15 = NULL, *_16 = NULL, *_17 = NULL, *_18 = NULL, *_19 = NULL, *_20 = NULL, *_21 = NULL, *_23 = NULL, *_24 = NULL, **_27, *_28 = NULL, *_29 = NULL, *_30 = NULL, **_34, *_37 = NULL, **_40, *_41;
 
 	ZEPHIR_MM_GROW();
 	zephir_fetch_params(1, 1, 1, &doc, &add_param);
@@ -580,22 +580,20 @@ PHP_METHOD(Xs_Index, update) {
 		ZEPHIR_CALL_METHOD(NULL, this_ptr, "appendbuffer", NULL, 20, _18);
 		zephir_check_call_status();
 	} else {
-		Z_SET_ISREF_P(cmds);
-		ZEPHIR_CALL_FUNCTION(&lastCmd, "array_pop", NULL, 21, cmds);
-		Z_UNSET_ISREF_P(cmds);
-		zephir_check_call_status();
-		zephir_is_iterable(cmds, &_42, &_41, 0, 0, "xs/index.zep", 202);
-		for (
-		  ; zephir_hash_get_current_data_ex(_42, (void**) &_43, &_41) == SUCCESS
-		  ; zephir_hash_move_forward_ex(_42, &_41)
-		) {
-			ZEPHIR_GET_HVALUE(cmd, _43);
-			ZEPHIR_CALL_METHOD(NULL, this_ptr, "execcommand", &_44, 0, cmd);
+		i = 0;
+		while (1) {
+			if (!(i < (zephir_fast_count_int(cmds TSRMLS_CC) - 1))) {
+				break;
+			}
+			zephir_array_fetch_long(&_41, cmds, i, PH_NOISY | PH_READONLY, "xs/index.zep", 201 TSRMLS_CC);
+			ZEPHIR_CALL_METHOD(NULL, this_ptr, "execcommand", &_42, 0, _41);
 			zephir_check_call_status();
+			i++;
 		}
+		zephir_array_fetch_long(&_41, cmds, i, PH_NOISY | PH_READONLY, "xs/index.zep", 204 TSRMLS_CC);
 		ZEPHIR_INIT_NVAR(_3);
 		ZVAL_LONG(_3, 250);
-		ZEPHIR_CALL_METHOD(NULL, this_ptr, "execcommand", &_44, 0, lastCmd, _3);
+		ZEPHIR_CALL_METHOD(NULL, this_ptr, "execcommand", &_42, 0, _41, _3);
 		zephir_check_call_status();
 	}
 	ZEPHIR_CALL_METHOD(NULL, doc, "aftersubmit", NULL, 0, this_ptr);
@@ -637,7 +635,7 @@ PHP_METHOD(Xs_Index, del) {
 		ZEPHIR_CPY_WRT(field, _1);
 	}
 	if (Z_TYPE_P(term) == IS_ARRAY) {
-		ZEPHIR_CALL_FUNCTION(&terms, "array_unique", NULL, 22, term);
+		ZEPHIR_CALL_FUNCTION(&terms, "array_unique", NULL, 21, term);
 		zephir_check_call_status();
 	} else {
 		ZEPHIR_INIT_NVAR(terms);
@@ -653,7 +651,7 @@ PHP_METHOD(Xs_Index, del) {
 	zephir_check_temp_parameter(_4);
 	zephir_check_call_status();
 	ZEPHIR_CPY_WRT(terms, _1);
-	zephir_is_iterable(terms, &_6, &_5, 0, 0, "xs/index.zep", 226);
+	zephir_is_iterable(terms, &_6, &_5, 0, 0, "xs/index.zep", 229);
 	for (
 	  ; zephir_hash_get_current_data_ex(_6, (void**) &_7, &_5) == SUCCESS
 	  ; zephir_hash_move_forward_ex(_6, &_5)
@@ -671,7 +669,7 @@ PHP_METHOD(Xs_Index, del) {
 		ZVAL_LONG(_11, 0);
 		ZEPHIR_CALL_METHOD(NULL, _4, "__construct", &_12, 19, _10, _11, _8, _9);
 		zephir_check_call_status();
-		zephir_array_append(&cmds, _4, PH_SEPARATE, "xs/index.zep", 224);
+		zephir_array_append(&cmds, _4, PH_SEPARATE, "xs/index.zep", 227);
 	}
 	_0 = zephir_fetch_nproperty_this(this_ptr, SL("bufSize"), PH_NOISY_CC);
 	if (ZEPHIR_GT_LONG(_0, 0)) {
@@ -681,7 +679,7 @@ PHP_METHOD(Xs_Index, del) {
 		zephir_check_call_status();
 	} else {
 		if (zephir_fast_count_int(cmds TSRMLS_CC) == 1) {
-			zephir_array_fetch_long(&_13, cmds, 0, PH_NOISY | PH_READONLY, "xs/index.zep", 230 TSRMLS_CC);
+			zephir_array_fetch_long(&_13, cmds, 0, PH_NOISY | PH_READONLY, "xs/index.zep", 233 TSRMLS_CC);
 			ZEPHIR_INIT_NVAR(_9);
 			ZVAL_LONG(_9, 250);
 			ZEPHIR_CALL_METHOD(NULL, this_ptr, "execcommand", &_14, 0, _13, _9);
@@ -723,9 +721,9 @@ PHP_METHOD(Xs_Index, addExdata) {
 	}
 
 
-	_0 = zephir_fast_strlen_ev(data) < 255;
+	_0 = checkFile;
 	if (_0) {
-		_0 = checkFile;
+		_0 = zephir_fast_strlen_ev(data) < 255;
 	}
 	_1 = _0;
 	if (_1) {
@@ -735,7 +733,7 @@ PHP_METHOD(Xs_Index, addExdata) {
 		ZEPHIR_INIT_VAR(dataVar);
 		zephir_file_get_contents(dataVar, data TSRMLS_CC);
 		if (unlikely(ZEPHIR_IS_FALSE_IDENTICAL(dataVar))) {
-			ZEPHIR_THROW_EXCEPTION_DEBUG_STR(xs_exception_ce, "Failed to read exdata from file", "xs/index.zep", 246);
+			ZEPHIR_THROW_EXCEPTION_DEBUG_STR(xs_exception_ce, "Failed to read exdata from file", "xs/index.zep", 252);
 			return;
 		}
 		zephir_get_strval(_2, dataVar);
@@ -747,7 +745,7 @@ PHP_METHOD(Xs_Index, addExdata) {
 	ZVAL_LONG(&_4, 1);
 	ZEPHIR_INIT_VAR(_5);
 	zephir_substr(_5, data, 0 , 1 , 0);
-	ZEPHIR_CALL_FUNCTION(&_6, "ord", NULL, 23, _5);
+	ZEPHIR_CALL_FUNCTION(&_6, "ord", NULL, 22, _5);
 	zephir_check_call_status();
 	first = zephir_get_intval(_6);
 	do {
@@ -762,7 +760,7 @@ PHP_METHOD(Xs_Index, addExdata) {
 		ZEPHIR_CONCAT_SVS(_9, "Invalid start command of exdata (CMD:", &_8, ")");
 		ZEPHIR_CALL_METHOD(NULL, _7, "__construct", NULL, 4, _9);
 		zephir_check_call_status();
-		zephir_throw_exception_debug(_7, "xs/index.zep", 259 TSRMLS_CC);
+		zephir_throw_exception_debug(_7, "xs/index.zep", 265 TSRMLS_CC);
 		ZEPHIR_MM_RESTORE();
 		return;
 	} while(0);
@@ -1048,7 +1046,7 @@ PHP_METHOD(Xs_Index, stopRebuild) {
 			ZEPHIR_CALL_METHOD(&_2, ex, "getcode", NULL, 0);
 			zephir_check_call_status();
 			if (!ZEPHIR_IS_LONG_IDENTICAL(_2, 450)) {
-				zephir_throw_exception_debug(ex, "xs/index.zep", 351 TSRMLS_CC);
+				zephir_throw_exception_debug(ex, "xs/index.zep", 362 TSRMLS_CC);
 				ZEPHIR_MM_RESTORE();
 				return;
 			}
@@ -1111,7 +1109,7 @@ PHP_METHOD(Xs_Index, flushLogging) {
 			if (ZEPHIR_IS_LONG_IDENTICAL(_2, 504)) {
 				RETURN_MM_BOOL(0);
 			}
-			zephir_throw_exception_debug(ex, "xs/index.zep", 373 TSRMLS_CC);
+			zephir_throw_exception_debug(ex, "xs/index.zep", 384 TSRMLS_CC);
 			ZEPHIR_MM_RESTORE();
 			return;
 		}
@@ -1151,7 +1149,7 @@ PHP_METHOD(Xs_Index, flushIndex) {
 				}
 			} while(0);
 
-			zephir_throw_exception_debug(ex, "xs/index.zep", 390 TSRMLS_CC);
+			zephir_throw_exception_debug(ex, "xs/index.zep", 401 TSRMLS_CC);
 			ZEPHIR_MM_RESTORE();
 			return;
 		}
@@ -1221,7 +1219,7 @@ PHP_METHOD(Xs_Index, close) {
 
 	ZEPHIR_CALL_METHOD(NULL, this_ptr, "closebuffer", NULL, 0);
 	zephir_check_call_status();
-	ZEPHIR_CALL_PARENT(NULL, xs_index_ce, this_ptr, "close", &_0, 24, ioerr);
+	ZEPHIR_CALL_PARENT(NULL, xs_index_ce, this_ptr, "close", &_0, 23, ioerr);
 	zephir_check_call_status();
 	ZEPHIR_MM_RESTORE();
 
@@ -1230,8 +1228,8 @@ PHP_METHOD(Xs_Index, close) {
 PHP_METHOD(Xs_Index, appendBuffer) {
 
 	int ZEPHIR_LAST_CALL_STATUS;
-	zval *buf_param = NULL, *_0, *_1, *_2, *_3, *_4;
-	zval *buf = NULL;
+	zval *buf_param = NULL, *_0, *_3, *_4, *_5, *_6, *_7;
+	zval *buf = NULL, *_1 = NULL, *_2;
 
 	ZEPHIR_MM_GROW();
 	zephir_fetch_params(1, 1, 0, &buf_param);
@@ -1239,18 +1237,23 @@ PHP_METHOD(Xs_Index, appendBuffer) {
 	zephir_get_strval(buf, buf_param);
 
 
-	zephir_update_property_this(this_ptr, SL("buf"), buf TSRMLS_CC);
-	_0 = zephir_fetch_nproperty_this(this_ptr, SL("buf"), PH_NOISY_CC);
-	_1 = zephir_fetch_nproperty_this(this_ptr, SL("bufSize"), PH_NOISY_CC);
-	if (ZEPHIR_LE_LONG(_1, zephir_fast_strlen_ev(_0))) {
-		_2 = zephir_fetch_nproperty_this(this_ptr, SL("buf"), PH_NOISY_CC);
-		ZEPHIR_INIT_VAR(_3);
-		ZVAL_BOOL(_3, 0);
-		ZEPHIR_CALL_METHOD(NULL, this_ptr, "addexdata", NULL, 0, _2, _3);
+	ZEPHIR_OBS_VAR(_0);
+	zephir_read_property_this(&_0, this_ptr, SL("buf"), PH_NOISY_CC);
+	zephir_get_strval(_1, _0);
+	ZEPHIR_INIT_VAR(_2);
+	ZEPHIR_CONCAT_VV(_2, _1, buf);
+	zephir_update_property_this(this_ptr, SL("buf"), _2 TSRMLS_CC);
+	_3 = zephir_fetch_nproperty_this(this_ptr, SL("buf"), PH_NOISY_CC);
+	_4 = zephir_fetch_nproperty_this(this_ptr, SL("bufSize"), PH_NOISY_CC);
+	if (ZEPHIR_LE_LONG(_4, zephir_fast_strlen_ev(_3))) {
+		_5 = zephir_fetch_nproperty_this(this_ptr, SL("buf"), PH_NOISY_CC);
+		ZEPHIR_INIT_VAR(_6);
+		ZVAL_BOOL(_6, 0);
+		ZEPHIR_CALL_METHOD(NULL, this_ptr, "addexdata", NULL, 0, _5, _6);
 		zephir_check_call_status();
-		ZEPHIR_INIT_ZVAL_NREF(_4);
-		ZVAL_STRING(_4, "", 1);
-		zephir_update_property_this(this_ptr, SL("buf"), _4 TSRMLS_CC);
+		ZEPHIR_INIT_ZVAL_NREF(_7);
+		ZVAL_STRING(_7, "", 1);
+		zephir_update_property_this(this_ptr, SL("buf"), _7 TSRMLS_CC);
 	}
 	ZEPHIR_MM_RESTORE();
 

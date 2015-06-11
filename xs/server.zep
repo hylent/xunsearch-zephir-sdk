@@ -125,7 +125,7 @@ class Server extends Component
         }
 
         if (cmd->cmd & 0x80) {
-            let this->sendBuffer .= cmd;
+            let this->sendBuffer = (string) this->sendBuffer . (string) cmd;
             return true;
         }
 

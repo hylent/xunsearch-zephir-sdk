@@ -693,7 +693,7 @@ class Search extends Server
         return value;
     }
 
-    private function logQuery(var query = null) -> void
+    private function logQuery(string query = "") -> void
     {
         var terms, term, pos2;
         string log;
@@ -702,10 +702,10 @@ class Search extends Server
         if this->isRobotAgent() {
             return;
         }
-        if query !== "" && query !== null {
+        if query->length() > 0 {
             let terms = this->terms(query, false);
         } else {
-            let query = this->query;
+            let query = (string) this->query;
             if ! this->lastCount
                 || (this->defaultOp == Command::CMD_QUERY_OP_OR && strpos(query, " "))
                 || strpos(query, " OR ")

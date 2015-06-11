@@ -113,7 +113,7 @@ PHP_METHOD(Xs_Xs, convert) {
 		_5 = zephir_is_true(_7);
 	}
 	if (_5) {
-		ZEPHIR_RETURN_CALL_FUNCTION("mb_convert_encoding", NULL, 65, data, to, from);
+		ZEPHIR_RETURN_CALL_FUNCTION("mb_convert_encoding", NULL, 64, data, to, from);
 		zephir_check_call_status();
 		RETURN_MM();
 	}
@@ -152,7 +152,7 @@ PHP_METHOD(Xs_Xs, __construct) {
 	zephir_file_get_contents(_0, file TSRMLS_CC);
 	zephir_get_strval(_2, _0);
 	ZEPHIR_CPY_WRT(data, _2);
-	ZEPHIR_CALL_METHOD(&config, this_ptr, "parseinidata", NULL, 66, data);
+	ZEPHIR_CALL_METHOD(&config, this_ptr, "parseinidata", NULL, 65, data);
 	zephir_check_call_status();
 	ZEPHIR_INIT_VAR(scheme);
 	object_init_ex(scheme, xs_fieldscheme_ce);
@@ -174,7 +174,7 @@ PHP_METHOD(Xs_Xs, __construct) {
 	}
 	ZEPHIR_INIT_NVAR(_0);
 	ZVAL_BOOL(_0, 1);
-	ZEPHIR_CALL_METHOD(NULL, scheme, "checkvalid", NULL, 67, _0);
+	ZEPHIR_CALL_METHOD(NULL, scheme, "checkvalid", NULL, 66, _0);
 	zephir_check_call_status();
 	zephir_update_property_this(this_ptr, SL("scheme"), scheme TSRMLS_CC);
 	zephir_update_property_this(this_ptr, SL("bindScheme"), scheme TSRMLS_CC);
@@ -182,7 +182,7 @@ PHP_METHOD(Xs_Xs, __construct) {
 	if (!(zephir_array_isset_string(config, SS("project.name")))) {
 		ZEPHIR_SINIT_VAR(_7);
 		ZVAL_STRING(&_7, ".ini", 0);
-		ZEPHIR_CALL_FUNCTION(&_8, "basename", NULL, 68, file, &_7);
+		ZEPHIR_CALL_FUNCTION(&_8, "basename", NULL, 67, file, &_7);
 		zephir_check_call_status();
 		ZEPHIR_INIT_NVAR(_0);
 		ZVAL_STRING(_0, "project.name", 1);
@@ -381,7 +381,7 @@ PHP_METHOD(Xs_Xs, getIndex) {
 	zephir_check_call_status();
 	ZEPHIR_INIT_NVAR(_4);
 	ZVAL_LONG(_4, 0);
-	ZEPHIR_CALL_METHOD(NULL, index, "settimeout", NULL, 69, _4);
+	ZEPHIR_CALL_METHOD(NULL, index, "settimeout", NULL, 68, _4);
 	zephir_check_call_status();
 	zephir_is_iterable(adds, &_9, &_8, 0, 0, "xs/xs.zep", 176);
 	for (
@@ -394,11 +394,11 @@ PHP_METHOD(Xs_Xs, getIndex) {
 		zephir_get_strval(_11, _4);
 		ZEPHIR_CPY_WRT(conn, _11);
 		if (zephir_fast_strlen_ev(conn) > 0) {
-			ZEPHIR_CALL_METHOD(&_13, index, "addserver", &_14, 70, conn);
+			ZEPHIR_CALL_METHOD(&_13, index, "addserver", &_14, 69, conn);
 			zephir_check_call_status();
 			ZEPHIR_INIT_NVAR(_6);
 			ZVAL_LONG(_6, 0);
-			ZEPHIR_CALL_METHOD(NULL, _13, "settimeout", NULL, 69, _6);
+			ZEPHIR_CALL_METHOD(NULL, _13, "settimeout", NULL, 68, _6);
 			zephir_check_call_status();
 		}
 	}
@@ -453,7 +453,7 @@ PHP_METHOD(Xs_Xs, getSearch) {
 	c = zephir_fast_count_int(conns TSRMLS_CC);
 	if (c > 1) {
 		Z_SET_ISREF_P(conns);
-		ZEPHIR_CALL_FUNCTION(NULL, "shuffle", NULL, 71, conns);
+		ZEPHIR_CALL_FUNCTION(NULL, "shuffle", NULL, 70, conns);
 		Z_UNSET_ISREF_P(conns);
 		zephir_check_call_status();
 	}
@@ -468,11 +468,11 @@ PHP_METHOD(Xs_Xs, getSearch) {
 			ZEPHIR_INIT_NVAR(search);
 			object_init_ex(search, xs_search_ce);
 			zephir_array_fetch_long(&_7, conns, i, PH_NOISY | PH_READONLY, "xs/xs.zep", 214 TSRMLS_CC);
-			ZEPHIR_CALL_METHOD(NULL, search, "__construct", &_8, 72, _7, this_ptr);
+			ZEPHIR_CALL_METHOD(NULL, search, "__construct", &_8, 71, _7, this_ptr);
 			zephir_check_call_status_or_jump(try_end_1);
 			ZEPHIR_CALL_METHOD(&_6, this_ptr, "getdefaultcharset", &_9, 0);
 			zephir_check_call_status_or_jump(try_end_1);
-			ZEPHIR_CALL_METHOD(NULL, search, "setcharset", &_10, 73, _6);
+			ZEPHIR_CALL_METHOD(NULL, search, "setcharset", &_10, 72, _6);
 			zephir_check_call_status_or_jump(try_end_1);
 			zephir_update_property_this(this_ptr, SL("search"), search TSRMLS_CC);
 			RETURN_CCTOR(search);

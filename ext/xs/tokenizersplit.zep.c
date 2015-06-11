@@ -94,7 +94,7 @@ PHP_METHOD(Xs_TokenizerSplit, getTokens) {
 	}
 	if (_6) {
 		_11 = zephir_fetch_nproperty_this(this_ptr, SL("arg"), PH_NOISY_CC);
-		ZEPHIR_RETURN_CALL_FUNCTION("preg_split", NULL, 46, _11, value);
+		ZEPHIR_RETURN_CALL_FUNCTION("preg_split", NULL, 45, _11, value);
 		zephir_check_call_status();
 		RETURN_MM();
 	}

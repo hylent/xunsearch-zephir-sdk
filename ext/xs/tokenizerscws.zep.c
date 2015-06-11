@@ -74,7 +74,7 @@ PHP_METHOD(Xs_TokenizerScws, __construct) {
 
 	_0 = zephir_fetch_static_property_ce(xs_tokenizerscws_ce, SL("server") TSRMLS_CC);
 	if (Z_TYPE_P(_0) == IS_NULL) {
-		ZEPHIR_CALL_CE_STATIC(&xs, xs_xs_ce, "getlastxs", &_1, 61);
+		ZEPHIR_CALL_CE_STATIC(&xs, xs_xs_ce, "getlastxs", &_1, 60);
 		zephir_check_call_status();
 		if (Z_TYPE_P(xs) == IS_NULL) {
 			ZEPHIR_INIT_VAR(_2);
@@ -276,7 +276,7 @@ PHP_METHOD(Xs_TokenizerScws, setDict) {
 	if (Z_TYPE_P(mode) != IS_LONG) {
 		ZEPHIR_SINIT_VAR(_0);
 		ZVAL_STRING(&_0, ".txt", 0);
-		ZEPHIR_CALL_FUNCTION(&_1, "stripos", NULL, 62, fpath, &_0);
+		ZEPHIR_CALL_FUNCTION(&_1, "stripos", NULL, 61, fpath, &_0);
 		zephir_check_call_status();
 		ZEPHIR_INIT_NVAR(mode);
 		if (ZEPHIR_IS_FALSE_IDENTICAL(_1)) {
@@ -322,7 +322,7 @@ PHP_METHOD(Xs_TokenizerScws, addDict) {
 	if (Z_TYPE_P(mode) != IS_LONG) {
 		ZEPHIR_SINIT_VAR(_0);
 		ZVAL_STRING(&_0, ".txt", 0);
-		ZEPHIR_CALL_FUNCTION(&_1, "stripos", NULL, 62, fpath, &_0);
+		ZEPHIR_CALL_FUNCTION(&_1, "stripos", NULL, 61, fpath, &_0);
 		zephir_check_call_status();
 		ZEPHIR_INIT_NVAR(mode);
 		if (ZEPHIR_IS_FALSE_IDENTICAL(_1)) {
@@ -424,7 +424,7 @@ PHP_METHOD(Xs_TokenizerScws, getResult) {
 	array_init(words);
 
 
-	ZEPHIR_CALL_METHOD(&_0, this_ptr, "applysetting", NULL, 63, text);
+	ZEPHIR_CALL_METHOD(&_0, this_ptr, "applysetting", NULL, 62, text);
 	zephir_check_call_status();
 	zephir_get_strval(text, _0);
 	ZEPHIR_INIT_VAR(cmd);
@@ -498,7 +498,7 @@ PHP_METHOD(Xs_TokenizerScws, getTops) {
 	array_init(words);
 
 
-	ZEPHIR_CALL_METHOD(&_0, this_ptr, "applysetting", NULL, 63, text);
+	ZEPHIR_CALL_METHOD(&_0, this_ptr, "applysetting", NULL, 62, text);
 	zephir_check_call_status();
 	zephir_get_strval(text, _0);
 	ZEPHIR_INIT_VAR(cmd);
@@ -558,7 +558,7 @@ PHP_METHOD(Xs_TokenizerScws, hasWord) {
 	zephir_get_strval(xattr, xattr_param);
 
 
-	ZEPHIR_CALL_METHOD(&_0, this_ptr, "applysetting", NULL, 63, text);
+	ZEPHIR_CALL_METHOD(&_0, this_ptr, "applysetting", NULL, 62, text);
 	zephir_check_call_status();
 	zephir_get_strval(text, _0);
 	ZEPHIR_INIT_VAR(cmd);
