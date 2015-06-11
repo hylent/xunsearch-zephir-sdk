@@ -454,7 +454,7 @@ PHP_METHOD(Xs_TokenizerScws, getResult) {
 		ZVAL_STRING(&_7, "Ioff/a4attr/a*word", 0);
 		ZEPHIR_CALL_FUNCTION(&tmp, "unpack", &_8, 5, &_7, _6);
 		zephir_check_call_status();
-		zephir_array_fetch_string(&_11, tmp, SL("word"), PH_NOISY | PH_READONLY, "xs/tokenizerscws.zep", 130 TSRMLS_CC);
+		zephir_array_fetch_string(&_11, tmp, SL("word"), PH_NOISY | PH_READONLY, "xs/tokenizerscws.zep", 148 TSRMLS_CC);
 		_12 = zephir_fetch_static_property_ce(xs_tokenizerscws_ce, SL("charset") TSRMLS_CC);
 		ZEPHIR_INIT_NVAR(_1);
 		ZVAL_STRING(_1, "UTF-8", ZEPHIR_TEMP_PARAM_COPY);
@@ -462,7 +462,7 @@ PHP_METHOD(Xs_TokenizerScws, getResult) {
 		zephir_check_temp_parameter(_1);
 		zephir_check_call_status();
 		zephir_array_update_string(&tmp, SL("word"), &_9, PH_COPY | PH_SEPARATE);
-		zephir_array_append(&words, tmp, PH_SEPARATE, "xs/tokenizerscws.zep", 131);
+		zephir_array_append(&words, tmp, PH_SEPARATE, "xs/tokenizerscws.zep", 149);
 		_13 = zephir_fetch_static_property_ce(xs_tokenizerscws_ce, SL("server") TSRMLS_CC);
 		ZEPHIR_CALL_METHOD(&res, _13, "getrespond", NULL, 0);
 		zephir_check_call_status();
@@ -528,7 +528,7 @@ PHP_METHOD(Xs_TokenizerScws, getTops) {
 		ZVAL_STRING(&_7, "Itimes/a4attr/a*word", 0);
 		ZEPHIR_CALL_FUNCTION(&tmp, "unpack", &_8, 5, &_7, _6);
 		zephir_check_call_status();
-		zephir_array_fetch_string(&_11, tmp, SL("word"), PH_NOISY | PH_READONLY, "xs/tokenizerscws.zep", 146 TSRMLS_CC);
+		zephir_array_fetch_string(&_11, tmp, SL("word"), PH_NOISY | PH_READONLY, "xs/tokenizerscws.zep", 164 TSRMLS_CC);
 		_12 = zephir_fetch_static_property_ce(xs_tokenizerscws_ce, SL("charset") TSRMLS_CC);
 		ZEPHIR_INIT_NVAR(_1);
 		ZVAL_STRING(_1, "UTF-8", ZEPHIR_TEMP_PARAM_COPY);
@@ -536,7 +536,7 @@ PHP_METHOD(Xs_TokenizerScws, getTops) {
 		zephir_check_temp_parameter(_1);
 		zephir_check_call_status();
 		zephir_array_update_string(&tmp, SL("word"), &_9, PH_COPY | PH_SEPARATE);
-		zephir_array_append(&words, tmp, PH_SEPARATE, "xs/tokenizerscws.zep", 147);
+		zephir_array_append(&words, tmp, PH_SEPARATE, "xs/tokenizerscws.zep", 165);
 		_13 = zephir_fetch_static_property_ce(xs_tokenizerscws_ce, SL("server") TSRMLS_CC);
 		ZEPHIR_CALL_METHOD(&res, _13, "getrespond", NULL, 0);
 		zephir_check_call_status();
@@ -604,14 +604,14 @@ PHP_METHOD(Xs_TokenizerScws, applySetting) {
 	zephir_read_property_this(&_1, this_ptr, SL("setting"), PH_NOISY_CC);
 	if (Z_TYPE_P(_1) == IS_ARRAY) {
 		_2 = zephir_fetch_nproperty_this(this_ptr, SL("setting"), PH_NOISY_CC);
-		zephir_is_iterable(_2, &_4, &_3, 0, 0, "xs/tokenizerscws.zep", 178);
+		zephir_is_iterable(_2, &_4, &_3, 0, 0, "xs/tokenizerscws.zep", 196);
 		for (
 		  ; zephir_hash_get_current_data_ex(_4, (void**) &_5, &_3) == SUCCESS
 		  ; zephir_hash_move_forward_ex(_4, &_3)
 		) {
 			ZEPHIR_GET_HVALUE(cmd, _5);
 			if (Z_TYPE_P(cmd) == IS_ARRAY) {
-				zephir_is_iterable(cmd, &_7, &_6, 0, 0, "xs/tokenizerscws.zep", 174);
+				zephir_is_iterable(cmd, &_7, &_6, 0, 0, "xs/tokenizerscws.zep", 192);
 				for (
 				  ; zephir_hash_get_current_data_ex(_7, (void**) &_8, &_6) == SUCCESS
 				  ; zephir_hash_move_forward_ex(_7, &_6)

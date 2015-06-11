@@ -65,7 +65,11 @@ class TokenizerScws implements Tokenizer
 
     public function setIgnore(boolean yes = true)
     {
-        let this->setting["ignore"] = new Command(Command::CMD_SEARCH_SCWS_SET, Command::CMD_SCWS_SET_IGNORE, yes ? 1 : 0);
+        let this->setting["ignore"] = new Command(
+            Command::CMD_SEARCH_SCWS_SET,
+            Command::CMD_SCWS_SET_IGNORE,
+            yes ? 1 : 0
+        );
         return this;
     }
 
@@ -85,7 +89,12 @@ class TokenizerScws implements Tokenizer
                 let mode = self::XDICT_TXT;
             }
         }
-        let this->setting["set_dict"] = new Command(Command::CMD_SEARCH_SCWS_SET, Command::CMD_SCWS_SET_DICT, mode, fpath);
+        let this->setting["set_dict"] = new Command(
+            Command::CMD_SEARCH_SCWS_SET,
+            Command::CMD_SCWS_SET_DICT,
+            mode,
+            fpath
+        );
         unset(this->setting["add_dict"]);
         return this;
     }
@@ -99,13 +108,22 @@ class TokenizerScws implements Tokenizer
                 let mode = self::XDICT_TXT;
             }
         }
-        let this->setting["add_dict"][] = new Command(Command::CMD_SEARCH_SCWS_SET, Command::CMD_SCWS_ADD_DICT, mode, fpath);
+        let this->setting["add_dict"][] = new Command(
+            Command::CMD_SEARCH_SCWS_SET,
+            Command::CMD_SCWS_ADD_DICT,
+            mode,
+            fpath
+        );
         return this;
     }
 
     public function setDuality(boolean yes = true)
     {
-        let this->setting["duality"] = new Command(Command::CMD_SEARCH_SCWS_SET, Command::CMD_SCWS_SET_DUALITY, yes ? 1 : 0);
+        let this->setting["duality"] = new Command(
+            Command::CMD_SEARCH_SCWS_SET,
+            Command::CMD_SCWS_SET_DUALITY,
+            yes ? 1 : 0
+        );
         return this;
     }
 
