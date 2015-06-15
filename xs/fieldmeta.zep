@@ -249,7 +249,7 @@ class FieldMeta
         if fetch c, config["index"] && this->type != self::TYPE_BODY {
             let predef = __CLASS__ . "::FLAG_INDEX_" . strtoupper(c);
             if defined(predef) {
-                let this->flag = (this->flag & (0xffff - self::FLAG_INDEX_BOTH)) | (long) constant(predef);
+                let this->flag = (this->flag & (~ self::FLAG_INDEX_BOTH)) | (long) constant(predef);
             }
             if this->type == self::TYPE_ID {
                 let this->flag = this->flag | self::FLAG_INDEX_SELF;
@@ -270,7 +270,7 @@ class FieldMeta
                     let this->flag = this->flag | self::FLAG_WITH_POSITION;
                     break;
                 case "no":
-                    let this->flag = this->flag & (0xffff - self::FLAG_WITH_POSITION);
+                    let this->flag = this->flag & (~ self::FLAG_WITH_POSITION);
                     break;
             }
         }
@@ -281,7 +281,7 @@ class FieldMeta
                     let this->flag = this->flag | self::FLAG_NON_BOOL;
                     break;
                 case "no":
-                    let this->flag = this->flag & (0xffff - self::FLAG_NON_BOOL);
+                    let this->flag = this->flag & (~ self::FLAG_NON_BOOL);
                     break;
             }
         }

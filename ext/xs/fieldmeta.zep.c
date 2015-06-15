@@ -577,7 +577,7 @@ PHP_METHOD(Xs_FieldMeta, fromConfig) {
 			ZEPHIR_CALL_FUNCTION(&_4, "constant", &_5, 12, predef);
 			zephir_check_call_status();
 			ZEPHIR_INIT_ZVAL_NREF(_9);
-			ZVAL_LONG(_9, ((((int) (zephir_get_numberval(_7)) & ((0xffff - 0x03)))) | zephir_get_intval(_4)));
+			ZVAL_LONG(_9, ((((int) (zephir_get_numberval(_7)) & ~(0x03))) | zephir_get_intval(_4)));
 			zephir_update_property_this(this_ptr, SL("flag"), _9 TSRMLS_CC);
 		}
 		_6 = zephir_fetch_nproperty_this(this_ptr, SL("type"), PH_NOISY_CC);
@@ -620,7 +620,7 @@ PHP_METHOD(Xs_FieldMeta, fromConfig) {
 			if (ZEPHIR_IS_STRING(_0, "no")) {
 				_6 = zephir_fetch_nproperty_this(this_ptr, SL("flag"), PH_NOISY_CC);
 				ZEPHIR_INIT_ZVAL_NREF(_9);
-				ZVAL_LONG(_9, ((int) (zephir_get_numberval(_6)) & ((0xffff - 0x10))));
+				ZVAL_LONG(_9, ((int) (zephir_get_numberval(_6)) & ~(0x10)));
 				zephir_update_property_this(this_ptr, SL("flag"), _9 TSRMLS_CC);
 				break;
 			}
@@ -642,7 +642,7 @@ PHP_METHOD(Xs_FieldMeta, fromConfig) {
 			if (ZEPHIR_IS_STRING(_0, "no")) {
 				_6 = zephir_fetch_nproperty_this(this_ptr, SL("flag"), PH_NOISY_CC);
 				ZEPHIR_INIT_ZVAL_NREF(_9);
-				ZVAL_LONG(_9, ((int) (zephir_get_numberval(_6)) & ((0xffff - 0x80))));
+				ZVAL_LONG(_9, ((int) (zephir_get_numberval(_6)) & ~(0x80)));
 				zephir_update_property_this(this_ptr, SL("flag"), _9 TSRMLS_CC);
 				break;
 			}

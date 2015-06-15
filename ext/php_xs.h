@@ -14,7 +14,7 @@
 #define PHP_XS_VERSION     "1.4.9"
 #define PHP_XS_EXTNAME     "xs"
 #define PHP_XS_AUTHOR      "Hylent"
-#define PHP_XS_ZEPVERSION  "0.7.0a"
+#define PHP_XS_ZEPVERSION  "0.7.0b"
 #define PHP_XS_DESCRIPTION "Xunsearch SDK Zephir implementation"
 
 
